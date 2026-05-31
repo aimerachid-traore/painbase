@@ -1,0 +1,49 @@
+/* ── HAMBURGER + MOBILE NAV ──────────────────────────────────── */
+
+/* Bouton hamburger — visible seulement sous 860px */
+.hamburger{
+  display:none;flex-direction:column;justify-content:center;gap:5px;
+  width:38px;height:38px;background:none;border:1px solid var(--line);
+  border-radius:8px;cursor:pointer;padding:8px;transition:border-color .18s;
+  flex:none;
+}
+.hamburger:hover{border-color:var(--ink-faint)}
+.hamburger .bar{display:block;height:2px;border-radius:1px;background:var(--ink-dim);transition:transform .22s,opacity .22s,width .22s}
+.hamburger .bar:nth-child(1){width:16px}
+.hamburger .bar:nth-child(2){width:12px}
+.hamburger .bar:nth-child(3){width:16px}
+.hamburger.open .bar:nth-child(1){transform:translateY(7px) rotate(45deg);width:16px}
+.hamburger.open .bar:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger.open .bar:nth-child(3){transform:translateY(-7px) rotate(-45deg);width:16px}
+
+/* Mobile drawer */
+.mobile-drawer{
+  position:fixed;top:66px;left:0;right:0;z-index:49;
+  background:rgba(16,14,11,.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line-soft);
+  padding:0;max-height:0;overflow:hidden;
+  transition:max-height .32s cubic-bezier(.4,0,.2,1),padding .32s;
+}
+.mobile-drawer.open{
+  max-height:480px;
+  padding:12px 0 20px;
+}
+.mobile-drawer a, .mobile-drawer .mob-link{
+  display:block;padding:14px 28px;
+  font-size:16px;font-weight:500;color:var(--ink-dim);
+  border-bottom:1px solid var(--line-soft);
+  transition:color .15s,background .15s;cursor:pointer;
+}
+.mobile-drawer a:last-of-type,.mobile-drawer .mob-link:last-of-type{border-bottom:none}
+.mobile-drawer a:hover,.mobile-drawer .mob-link:hover{color:var(--ink);background:var(--panel)}
+.mobile-drawer a.active{color:var(--ember)}
+.mob-divider{height:1px;background:var(--line-soft);margin:8px 0}
+.mob-auth{display:flex;flex-direction:column;gap:10px;padding:14px 28px}
+.mob-auth .btn{width:100%;text-align:center;padding:13px}
+
+/* Show hamburger on small screens */
+@media(max-width:860px){
+  .hamburger{display:flex}
+  .nav-cta .pb-signup-trigger,
+  .nav-cta .pb-signin-trigger{display:none !important}
+}

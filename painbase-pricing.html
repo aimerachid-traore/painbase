@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PainBase — Pricing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth-ui.css">
+<link rel="stylesheet" href="mobile-nav.css">
+<style>
+:root{
+  --bg:#100E0B;--bg-2:#16130F;--panel:#1B1712;--panel-2:#211C16;
+  --line:#312A22;--line-soft:#241F19;--ink:#F3ECDF;--ink-dim:#A89C89;
+  --ink-faint:#6F6557;--ember:#FF5C38;--ember-soft:rgba(255,92,56,.14);
+  --gold:#F0A92B;--green:#79C58A;--maxw:1080px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-soft)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.logo .mark{width:26px;height:26px;border-radius:7px;background:var(--ember);position:relative;flex:none;box-shadow:0 0 0 4px var(--ember-soft)}
+.logo .mark::after{content:"";position:absolute;inset:0;border-radius:7px;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.5),transparent 60%)}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{color:var(--ink-dim);font-size:14.5px;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--ink)}
+.btn{font-family:'Archivo';font-weight:600;font-size:14.5px;border:none;cursor:pointer;padding:10px 18px;border-radius:9px;transition:transform .15s,box-shadow .2s,background .2s}
+.btn-primary{background:var(--ember);color:#1a0d08}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px -8px var(--ember)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--ink-dim)}
+@media(max-width:860px){.nav-links{display:none}}
+
+/* HERO */
+.pricing-hero{padding:72px 0 56px;text-align:center;position:relative}
+.pricing-hero::before{content:"";position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,var(--ember-soft),transparent 62%);filter:blur(24px);pointer-events:none}
+.pricing-hero .eyebrow{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:18px}
+.pricing-hero h1{font-family:'Fraunces';font-size:clamp(34px,5vw,58px);font-weight:600;letter-spacing:-.025em;line-height:1.06;max-width:16ch;margin:0 auto}
+.pricing-hero h1 em{color:var(--ember);font-style:italic}
+.pricing-hero p{color:var(--ink-dim);font-size:clamp(15px,2vw,18px);max-width:46ch;margin:20px auto 0}
+
+/* TOGGLE */
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:36px}
+.billing-toggle span{font-size:14px;color:var(--ink-dim)}
+.toggle-pill{
+  width:48px;height:26px;background:var(--line);border-radius:13px;
+  position:relative;cursor:pointer;transition:background .2s;border:none;
+  flex:none;
+}
+.toggle-pill.annual{background:var(--ember)}
+.toggle-knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink);transition:transform .2s}
+.toggle-pill.annual .toggle-knob{transform:translateX(22px)}
+.annual-badge{
+  font-family:'JetBrains Mono';font-size:11px;color:var(--green);
+  border:1px solid rgba(121,197,138,.3);border-radius:100px;
+  padding:3px 9px;background:rgba(121,197,138,.08);
+}
+
+/* PLANS GRID */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:56px;align-items:start}
+@media(max-width:840px){.plans{grid-template-columns:1fr}}
+
+.plan{
+  background:var(--panel);border:1px solid var(--line-soft);border-radius:18px;
+  padding:28px;transition:transform .18s,border-color .18s;
+  position:relative;overflow:hidden;
+}
+.plan:hover{transform:translateY(-4px)}
+.plan.featured{
+  border-color:var(--ember);background:var(--panel-2);
+  box-shadow:0 0 0 1px var(--ember),0 24px 48px -16px rgba(255,92,56,.2);
+}
+.plan-badge{
+  position:absolute;top:0;right:24px;
+  font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:#1a0d08;background:var(--ember);
+  padding:4px 12px 5px;border-radius:0 0 8px 8px;font-weight:700;
+}
+.plan-name{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px}
+.plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:4px}
+.plan-price .amount{font-family:'Fraunces';font-size:48px;font-weight:600;letter-spacing:-.03em;color:var(--ink)}
+.plan-price .period{font-size:15px;color:var(--ink-faint)}
+.plan-price .old{font-size:18px;color:var(--ink-faint);text-decoration:line-through;margin-left:6px}
+.plan-desc{font-size:14px;color:var(--ink-dim);margin-bottom:24px;line-height:1.5;min-height:40px}
+
+.plan-btn{
+  width:100%;padding:13px;border-radius:10px;font-family:'Archivo';
+  font-weight:700;font-size:15px;cursor:pointer;border:none;
+  transition:transform .15s,box-shadow .2s,background .2s;margin-bottom:26px;
+}
+.plan-btn.primary{background:var(--ember);color:#1a0d08}
+.plan-btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px -8px var(--ember)}
+.plan-btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.plan-btn.ghost:hover{border-color:var(--ink-dim)}
+.plan-btn.current{background:var(--bg-2);color:var(--ink-faint);border:1px solid var(--line);cursor:default}
+
+/* Features list */
+.features{display:flex;flex-direction:column;gap:10px;padding-top:4px;border-top:1px solid var(--line-soft)}
+.feat{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink-dim);line-height:1.4}
+.feat svg{flex:none;margin-top:2px}
+.feat.missing{color:var(--ink-faint)}
+.feat.missing svg path{stroke:var(--ink-faint)}
+
+/* COMPARISON TABLE */
+.compare{margin-top:80px}
+.compare h2{font-family:'Fraunces';font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:-.015em;margin-bottom:30px;text-align:center}
+.compare-table{width:100%;border-collapse:collapse;border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--panel)}
+.compare-table th{padding:14px 20px;font-family:'JetBrains Mono';font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);background:var(--bg-2);text-align:left;border-bottom:1px solid var(--line-soft)}
+.compare-table th:not(:first-child){text-align:center}
+.compare-table td{padding:14px 20px;font-size:14px;color:var(--ink-dim);border-bottom:1px solid var(--line-soft)}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table td:not(:first-child){text-align:center;font-family:'JetBrains Mono';font-size:13px}
+.compare-table .section-head td{background:var(--bg-2);font-family:'JetBrains Mono';font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ember);padding:10px 20px}
+.compare-table .check{color:var(--green)}
+.compare-table .cross{color:var(--line)}
+.compare-table .pro-col{color:var(--ember)}
+@media(max-width:600px){
+  .compare-table th:nth-child(3),.compare-table td:nth-child(3){display:none}
+}
+
+/* FAQ */
+.faq{margin-top:80px;padding-bottom:80px;max-width:680px;margin-left:auto;margin-right:auto}
+.faq h2{font-family:'Fraunces';font-size:28px;font-weight:600;text-align:center;margin-bottom:30px}
+.faq-item{border-bottom:1px solid var(--line-soft);overflow:hidden}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 0;cursor:pointer;font-size:15.5px;font-weight:600;user-select:none;transition:color .15s}
+.faq-q:hover{color:var(--ember)}
+.faq-arrow{font-size:18px;color:var(--ink-faint);transition:transform .22s;flex:none}
+.faq-item.open .faq-arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s cubic-bezier(.4,0,.2,1)}
+.faq-item.open .faq-a{max-height:200px}
+.faq-a p{font-size:14.5px;color:var(--ink-dim);line-height:1.65;padding-bottom:18px}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(12px);animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="painbase-landing.html" class="logo"><span class="mark"></span>PainBase</a>
+    <div class="nav-links">
+      <a href="painbase-landing.html">Browse problems</a>
+      <a href="painbase-landing.html#leaderboard">Leaderboard</a>
+      <a href="painbase-dashboard.html">Dashboard</a>
+      <a href="painbase-pricing.html" class="active">Pricing</a>
+    </div>
+    <div class="nav-cta" id="navCta">
+      <a href="#" class="pb-signin-trigger" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">Sign in</a>
+      <button class="btn btn-primary pb-signup-trigger">Start hunting</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="pricing-hero">
+  <div class="wrap">
+    <div class="eyebrow rv">Pricing</div>
+    <h1 class="rv" style="animation-delay:.08s">Simple pricing for <em>serious</em> builders.</h1>
+    <p class="rv" style="animation-delay:.15s">Start free. Upgrade when you find the problem worth pursuing.</p>
+
+    <div class="billing-toggle rv" style="animation-delay:.2s">
+      <span>Monthly</span>
+      <button class="toggle-pill" id="billingToggle" aria-label="Toggle billing period">
+        <div class="toggle-knob"></div>
+      </button>
+      <span>Annual</span>
+      <span class="annual-badge" id="annualBadge" style="opacity:0">Save 30%</span>
+    </div>
+  </div>
+</header>
+
+<!-- PLANS -->
+<section>
+  <div class="wrap">
+    <div class="plans rv" style="animation-delay:.25s">
+
+      <!-- FREE -->
+      <div class="plan">
+        <div class="plan-name">Free</div>
+        <div class="plan-price"><span class="amount">$0</span><span class="period">/mo</span></div>
+        <div class="plan-desc">Browse and explore. Perfect for validating your first idea.</div>
+        <button class="plan-btn ghost pb-signup-trigger" onclick="PBAuthModal.open('signup')">Get started free</button>
+        <div class="features">
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Access to top 20 problems</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI brief for each problem</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Trend charts</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Save up to 5 problems</div>
+          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Full source posts</div>
+          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Opportunity scores</div>
+          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Competitor analysis</div>
+          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>API access</div>
+        </div>
+      </div>
+
+      <!-- PRO — featured -->
+      <div class="plan featured">
+        <div class="plan-badge">Most popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">
+          <span class="amount" id="proPrice">$29</span>
+          <span class="period">/mo</span>
+          <span class="old" id="proOld" style="display:none">$29</span>
+        </div>
+        <div class="plan-desc">Everything you need to find, validate, and build your next product.</div>
+        <button class="plan-btn primary" onclick="PBAuthModal.open('signup')">Start 7-day free trial</button>
+        <div class="features">
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>All 48,000+ problems</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Full AI analysis & product angles</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited source posts</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Opportunity & competition scores</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Competitor breakdown</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited saved problems</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Weekly trend digests by email</div>
+          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>API access</div>
+        </div>
+      </div>
+
+      <!-- BUILDER -->
+      <div class="plan">
+        <div class="plan-name">Builder</div>
+        <div class="plan-price">
+          <span class="amount" id="builderPrice">$79</span>
+          <span class="period">/mo</span>
+          <span class="old" id="builderOld" style="display:none">$79</span>
+        </div>
+        <div class="plan-desc">For teams and agencies doing systematic opportunity research at scale.</div>
+        <button class="plan-btn ghost" onclick="PBAuthModal.open('signup')">Start 7-day free trial</button>
+        <div class="features">
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>REST API access</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>5 team seats</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Custom keyword monitoring</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Slack / webhook alerts</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Export to CSV / JSON</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority support</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>White-label reports (PDF)</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Social proof -->
+    <div class="rv" style="animation-delay:.35s;text-align:center;margin-top:36px;font-size:13.5px;color:var(--ink-faint)">
+      No credit card required on free plan &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp; 7-day free trial on paid plans
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="compare rv" style="animation-delay:.3s">
+  <div class="wrap">
+    <h2>Compare plans</h2>
+    <div style="overflow-x:auto">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:44%">Feature</th>
+            <th>Free</th>
+            <th style="color:var(--ember)">Pro</th>
+            <th>Builder</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="section-head"><td colspan="4">Problem access</td></tr>
+          <tr><td>Problems in database</td><td>Top 20</td><td class="pro-col">All 48k+</td><td>All 48k+</td></tr>
+          <tr><td>AI brief per problem</td><td class="check">✓</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Full AI analysis & product angle</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Opportunity & demand scores</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Source posts (Reddit/HN)</td><td>3 per problem</td><td class="pro-col">Unlimited</td><td>Unlimited</td></tr>
+          <tr><td>Competitor breakdown</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
+          <tr class="section-head"><td colspan="4">Research tools</td></tr>
+          <tr><td>Saved problems</td><td>5</td><td class="pro-col">Unlimited</td><td>Unlimited</td></tr>
+          <tr><td>Search & filters</td><td class="check">✓</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Weekly trend digest (email)</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
+          <tr><td>Custom keyword monitoring</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+          <tr class="section-head"><td colspan="4">Team & export</td></tr>
+          <tr><td>Team seats</td><td>1</td><td class="pro-col">1</td><td>5</td></tr>
+          <tr><td>REST API</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+          <tr><td>CSV / JSON export</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+          <tr><td>Slack / webhook alerts</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq rv" style="animation-delay:.3s">
+  <div class="wrap">
+    <h2>Frequently asked</h2>
+    <div id="faqList"></div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section style="padding:0 0 80px">
+  <div class="wrap">
+    <div style="border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,var(--panel-2),var(--bg-2));padding:56px 40px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;bottom:-140px;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,var(--ember-soft),transparent 65%)"></div>
+      <h2 style="font-family:'Fraunces';font-size:clamp(26px,3.5vw,38px);font-weight:600;letter-spacing:-.02em;position:relative">Your next idea is already a complaint.</h2>
+      <p style="color:var(--ink-dim);margin:14px auto 28px;max-width:44ch;font-size:16px;position:relative">Start free — no credit card. Upgrade when you find the problem worth building for.</p>
+      <button class="btn btn-primary" style="position:relative;padding:13px 28px;font-size:16px" onclick="PBAuthModal.open('signup')">Start hunting — it's free</button>
+    </div>
+  </div>
+</section>
+
+<footer style="border-top:1px solid var(--line-soft);padding:36px 0 52px;color:var(--ink-faint)">
+  <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;align-items:center">
+    <a href="painbase-landing.html" class="logo" style="font-size:17px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
+    <div style="display:flex;gap:22px;flex-wrap:wrap">
+      <a href="painbase-landing.html#explore" style="font-size:13.5px;color:var(--ink-faint)">Browse</a>
+      <a href="painbase-dashboard.html" style="font-size:13.5px;color:var(--ink-faint)">Dashboard</a>
+      <a href="#" style="font-size:13.5px;color:var(--ink-faint)">API</a>
+      <a href="#" style="font-size:13.5px;color:var(--ink-faint)">Terms</a>
+      <a href="#" style="font-size:13.5px;color:var(--ink-faint)">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="auth-ui.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+// ── Billing toggle ───────────────────────────────────────────────
+const toggle = document.getElementById('billingToggle');
+const badge  = document.getElementById('annualBadge');
+let annual = false;
+const PRICES = { pro:{ monthly:29, annual:20 }, builder:{ monthly:79, annual:55 } };
+
+toggle.addEventListener('click', () => {
+  annual = !annual;
+  toggle.classList.toggle('annual', annual);
+  badge.style.opacity = annual ? '1' : '0';
+  document.getElementById('proPrice').textContent     = '$' + (annual ? PRICES.pro.annual : PRICES.pro.monthly);
+  document.getElementById('builderPrice').textContent = '$' + (annual ? PRICES.builder.annual : PRICES.builder.monthly);
+  document.getElementById('proOld').style.display     = annual ? '' : 'none';
+  document.getElementById('builderOld').style.display = annual ? '' : 'none';
+  document.getElementById('proOld').textContent       = '$' + PRICES.pro.monthly;
+  document.getElementById('builderOld').textContent   = '$' + PRICES.builder.monthly;
+});
+
+// ── FAQ ──────────────────────────────────────────────────────────
+const FAQS = [
+  { q:'Is PainBase really free to start?',
+    a:'Yes. No credit card required. The free plan gives you access to the top 20 trending problems with AI briefs, trend charts, and up to 5 saved problems. Upgrade when you want the full database and deeper analysis.' },
+  { q:'Where does the data come from?',
+    a:'PainBase continuously mines Reddit (60+ subreddits) and Hacker News. Every post is classified by AI to identify genuine unresolved pain points. Posts are clustered by topic so 200+ separate complaints become one quantified problem with a verified mention count.' },
+  { q:'Can I cancel anytime?',
+    a:'Absolutely. No lock-in, no cancellation fees. If you cancel, your plan stays active until the end of the billing period, then downgrades to free.' },
+  { q:'What\'s the difference between the Pro and Builder plans?',
+    a:'Pro is designed for solo founders and indie hackers — it gives you the full research toolkit. Builder adds API access, 5 team seats, custom keyword monitoring, Slack alerts, and CSV/JSON export for teams doing systematic research at scale.' },
+  { q:'Do you offer refunds?',
+    a:'Yes. If you\'re not satisfied within the first 7 days of a paid plan, we\'ll refund you in full — no questions asked.' },
+  { q:'Is there a student or startup discount?',
+    a:'Yes — reach out via the support email with a .edu address or YC/Antler acceptance letter and we\'ll apply a 40% discount.' },
+];
+
+const faqList = document.getElementById('faqList');
+FAQS.forEach(({ q, a }) => {
+  const item = document.createElement('div');
+  item.className = 'faq-item';
+  item.innerHTML = `
+    <div class="faq-q">${q}<span class="faq-arrow">⌄</span></div>
+    <div class="faq-a"><p>${a}</p></div>`;
+  item.querySelector('.faq-q').addEventListener('click', () => {
+    const open = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!open) item.classList.add('open');
+  });
+  faqList.appendChild(item);
+});
+</script>
+</body>
+</html>

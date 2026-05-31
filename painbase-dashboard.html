@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PainBase — My Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth-ui.css">
+<link rel="stylesheet" href="mobile-nav.css">
+<style>
+:root{
+  --bg:#100E0B;--bg-2:#16130F;--panel:#1B1712;--panel-2:#211C16;
+  --line:#312A22;--line-soft:#241F19;--ink:#F3ECDF;--ink-dim:#A89C89;
+  --ink-faint:#6F6557;--ember:#FF5C38;--ember-soft:rgba(255,92,56,.14);
+  --gold:#F0A92B;--green:#79C58A;--blue:#5B9CF6;--maxw:1080px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-soft)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+.logo .mark{width:26px;height:26px;border-radius:7px;background:var(--ember);position:relative;flex:none;box-shadow:0 0 0 4px var(--ember-soft)}
+.logo .mark::after{content:"";position:absolute;inset:0;border-radius:7px;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.5),transparent 60%)}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{color:var(--ink-dim);font-size:14.5px;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--ink)}
+.btn{font-family:'Archivo';font-weight:600;font-size:14.5px;border:none;cursor:pointer;padding:10px 18px;border-radius:9px;transition:transform .15s,box-shadow .2s,background .2s}
+.btn-primary{background:var(--ember);color:#1a0d08}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px -8px var(--ember)}
+@media(max-width:860px){.nav-links{display:none}}
+
+/* PAGE HEADER */
+.dash-hero{padding:44px 0 36px;border-bottom:1px solid var(--line-soft)}
+.dash-hero .greeting{font-family:'JetBrains Mono';font-size:13px;color:var(--ink-faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.dash-hero h1{font-family:'Fraunces';font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.02em}
+
+/* STATS ROW */
+.dash-stats{display:flex;gap:0;margin-top:28px;border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--panel)}
+.dstat{flex:1;padding:18px 22px;border-right:1px solid var(--line-soft)}
+.dstat:last-child{border-right:none}
+.dstat .num{font-family:'JetBrains Mono';font-size:24px;font-weight:700;color:var(--ink)}
+.dstat .lbl{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;margin-top:3px}
+@media(max-width:560px){.dash-stats{flex-direction:column}.dstat{border-right:none;border-bottom:1px solid var(--line-soft)}.dstat:last-child{border-bottom:none}}
+
+/* TABS */
+.dash-tabs{display:flex;gap:0;margin-top:36px;border-bottom:1px solid var(--line-soft)}
+.dash-tab{padding:12px 20px;font-family:'JetBrains Mono';font-size:13px;font-weight:500;color:var(--ink-faint);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .18s,border-color .18s}
+.dash-tab.active{color:var(--ember);border-color:var(--ember)}
+.dash-tab:hover:not(.active){color:var(--ink-dim)}
+
+/* SAVED GRID */
+.saved-section{padding:30px 0 80px}
+.saved-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.saved-head h2{font-family:'Fraunces';font-size:20px;font-weight:600}
+.saved-head .count{font-family:'JetBrains Mono';font-size:12.5px;color:var(--ink-faint)}
+
+/* Cards — same as landing */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line-soft);border-radius:15px;padding:20px;cursor:pointer;transition:transform .18s,border-color .18s,background .18s;display:flex;flex-direction:column;min-height:208px;position:relative;overflow:hidden;text-decoration:none;color:inherit}
+.card:hover{transform:translateY(-3px);border-color:var(--ember);background:var(--panel-2)}
+.card.hot .intensity::after{opacity:.9}
+.intensity{position:absolute;top:0;right:0;width:46px;height:46px;overflow:hidden}
+.intensity::after{content:"";position:absolute;top:-23px;right:-23px;width:46px;height:46px;transform:rotate(45deg);background:var(--ember);opacity:0}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.tag{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);padding:4px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg-2)}
+.trend{font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:4px}
+.card h3{font-family:'Fraunces';font-weight:500;font-size:18px;line-height:1.22;letter-spacing:-.01em;flex:1}
+.card .ai{font-size:13.5px;color:var(--ink-dim);margin-top:10px;line-height:1.45}
+.badge-ai{font-family:'JetBrains Mono';font-size:10px;color:var(--ember);border:1px solid var(--ember);border-radius:4px;padding:1px 5px;margin-right:6px;vertical-align:middle}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:13px;border-top:1px solid var(--line-soft)}
+.card-foot .mentions{font-family:'JetBrains Mono';font-size:13px;color:var(--ink)}
+.card-foot .mentions span{color:var(--ink-faint)}
+
+/* unsave button on card */
+.unsave-btn{
+  background:none;border:1px solid var(--line);border-radius:6px;
+  color:var(--ink-faint);font-size:11px;font-family:'JetBrains Mono';
+  padding:3px 8px;cursor:pointer;transition:all .15s;
+}
+.unsave-btn:hover{border-color:#ff5c38;color:#ff5c38}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:80px 28px}
+.empty-state .icon{font-size:48px;margin-bottom:18px}
+.empty-state h3{font-family:'Fraunces';font-size:24px;font-weight:600;margin-bottom:12px}
+.empty-state p{color:var(--ink-dim);font-size:15.5px;max-width:38ch;margin:0 auto 28px}
+
+/* LOCKED STATE (not logged in) */
+.locked{
+  text-align:center;padding:80px 28px;
+  border:1px dashed var(--line);border-radius:18px;background:var(--panel);
+  margin-top:24px;
+}
+.locked .lock-icon{font-size:40px;margin-bottom:16px}
+.locked h3{font-family:'Fraunces';font-size:22px;font-weight:600;margin-bottom:10px}
+.locked p{color:var(--ink-dim);font-size:15px;max-width:36ch;margin:0 auto 24px;line-height:1.55}
+
+/* ACTIVITY FEED */
+.activity-list{display:flex;flex-direction:column;gap:0}
+.act-row{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid var(--line-soft)}
+.act-row:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;background:var(--ember);flex:none;margin-top:6px}
+.act-dot.green{background:var(--green)}
+.act-dot.gold{background:var(--gold)}
+.act-text{font-size:14px;color:var(--ink-dim);line-height:1.5}
+.act-text strong{color:var(--ink);font-weight:600}
+.act-time{font-family:'JetBrains Mono';font-size:11.5px;color:var(--ink-faint);margin-top:4px}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(10px);animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="painbase-landing.html" class="logo"><span class="mark"></span>PainBase</a>
+    <div class="nav-links">
+      <a href="painbase-landing.html">Browse problems</a>
+      <a href="painbase-landing.html#leaderboard">Leaderboard</a>
+      <a href="painbase-dashboard.html" class="active">Dashboard</a>
+      <a href="painbase-pricing.html">Pricing</a>
+    </div>
+    <div class="nav-cta" id="navCta">
+      <!-- filled by auth-ui.js -->
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="dash-hero rv" style="animation-delay:.05s">
+    <div class="greeting">My workspace</div>
+    <h1 id="dashTitle">Your dashboard</h1>
+    <div class="dash-stats" id="dashStats">
+      <div class="dstat"><div class="num" id="statSaved">—</div><div class="lbl">Problems saved</div></div>
+      <div class="dstat"><div class="num" id="statThemes">—</div><div class="lbl">Themes explored</div></div>
+      <div class="dstat"><div class="num" id="statPlan">Free</div><div class="lbl">Current plan</div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="dash-tabs rv" style="animation-delay:.1s">
+    <div class="dash-tab active" data-tab="saved">Saved problems</div>
+    <div class="dash-tab" data-tab="activity">Recent activity</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="saved-section" id="dashContent">
+    <div style="color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px;text-align:center;padding:60px 0">Loading…</div>
+  </div>
+
+</div>
+
+<footer style="border-top:1px solid var(--line-soft);padding:32px 0 50px;color:var(--ink-faint)">
+  <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;align-items:center">
+    <a href="painbase-landing.html" class="logo" style="font-size:16px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
+    <div style="display:flex;gap:22px;flex-wrap:wrap">
+      <a href="painbase-landing.html#explore" style="font-size:13px;color:var(--ink-faint)">Browse</a>
+      <a href="painbase-pricing.html" style="font-size:13px;color:var(--ink-faint)">Pricing</a>
+      <a href="#" style="font-size:13px;color:var(--ink-faint)">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="problems-data.js"></script>
+<script src="auth-ui.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+const fmt = n => n.toLocaleString('en-US');
+
+// ── Tab switching ────────────────────────────────────────────────
+document.querySelectorAll('.dash-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderTab(tab.dataset.tab);
+  });
+});
+
+// ── Render saved problems ────────────────────────────────────────
+function renderSaved(savedIds, allProblems) {
+  const content = document.getElementById('dashContent');
+
+  // Filter saved from all problems
+  const saved = allProblems.filter(p => savedIds.includes(p.id || p.id));
+
+  // Update stats
+  const themes = new Set(saved.map(p => p.theme));
+  document.getElementById('statSaved').textContent  = saved.length;
+  document.getElementById('statThemes').textContent = themes.size;
+
+  if (!saved.length) {
+    content.innerHTML = `
+      <div class="empty-state rv">
+        <div class="icon">🔖</div>
+        <h3>No saved problems yet</h3>
+        <p>Browse problems and click "Save problem" to build your research list.</p>
+        <a href="painbase-landing.html" class="btn btn-primary" style="display:inline-block">Browse problems →</a>
+      </div>`;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="saved-head rv">
+      <h2>Saved problems</h2>
+      <span class="count">${saved.length} problem${saved.length !== 1 ? 's' : ''}</span>
+    </div>
+    <div class="grid" id="savedGrid"></div>`;
+
+  const grid = document.getElementById('savedGrid');
+  saved.forEach((p, i) => {
+    const t = p.title || p.t;
+    const theme = p.theme;
+    const mentions = p.mentions;
+    const trend = p.trend_pct || p.trend || 0;
+    const hot = p.is_hot || p.hot;
+    const ai = p.ai_brief || p.ai || '';
+    const id = p.id;
+
+    const card = document.createElement('a');
+    card.className = `card rv ${hot ? 'hot' : ''}`;
+    card.href = `painbase-detail.html#id=${id}`;
+    card.style.animationDelay = `${i * 0.06}s`;
+    card.innerHTML = `
+      <div class="intensity"></div>
+      <div class="card-top">
+        <span class="tag">${theme}</span>
+        <span class="trend">▲ ${trend}%</span>
+      </div>
+      <h3>${t}</h3>
+      <p class="ai"><span class="badge-ai">AI</span>${ai}</p>
+      <div class="card-foot">
+        <span class="mentions">${fmt(mentions)} <span>mentions</span></span>
+        <button class="unsave-btn" data-id="${id}">✕ Remove</button>
+      </div>`;
+
+    // Unsave
+    card.querySelector('.unsave-btn').addEventListener('click', async e => {
+      e.preventDefault(); e.stopPropagation();
+      if (window.PB_CONFIGURED) {
+        await PBData.unsaveProblem(id);
+      } else {
+        // local fallback: just remove from UI
+      }
+      card.style.opacity = '0';
+      card.style.transform = 'scale(.95)';
+      card.style.transition = 'all .2s';
+      setTimeout(() => { card.remove(); updateStats(); }, 200);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+function updateStats() {
+  const remaining = document.querySelectorAll('#savedGrid .card').length;
+  document.getElementById('statSaved').textContent = remaining;
+  document.querySelector('.saved-head .count').textContent =
+    `${remaining} problem${remaining !== 1 ? 's' : ''}`;
+}
+
+// ── Render activity feed ─────────────────────────────────────────
+function renderActivity() {
+  const content = document.getElementById('dashContent');
+  // Static demo activity — replace with real Supabase query when ready
+  const items = [
+    { dot:'', text:'Saved <strong>Freelancers hate chasing late invoices</strong>', time:'2 hours ago' },
+    { dot:'green', text:'New problem trending: <strong>ADHD budgeting apps</strong> +38% this week', time:'5 hours ago' },
+    { dot:'gold', text:'Saved <strong>Devs rebuild auth + billing boilerplate</strong>', time:'Yesterday' },
+    { dot:'green', text:'PainBase added 3 new problems in <strong>Productivity</strong>', time:'2 days ago' },
+    { dot:'', text:'Saved <strong>Students can\'t turn lecture recordings into notes</strong>', time:'3 days ago' },
+  ];
+  content.innerHTML = `
+    <div class="saved-head rv"><h2>Recent activity</h2></div>
+    <div class="activity-list rv" style="animation-delay:.05s">
+      ${items.map(a => `
+        <div class="act-row">
+          <div class="act-dot ${a.dot}"></div>
+          <div><div class="act-text">${a.text}</div><div class="act-time">${a.time}</div></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderTab(tab) {
+  if (tab === 'activity') { renderActivity(); return; }
+  loadSaved();
+}
+
+// ── Main load ────────────────────────────────────────────────────
+async function loadSaved() {
+  const user = await PBAuth.getUser();
+
+  if (!user) {
+    document.getElementById('dashContent').innerHTML = `
+      <div class="locked rv">
+        <div class="lock-icon">🔐</div>
+        <h3>Sign in to see your saved problems</h3>
+        <p>Create a free account to save problems, track trends, and build your research list.</p>
+        <button class="btn btn-primary pb-signup-trigger" onclick="PBAuthModal.open('signup')">Create free account</button>
+        <br><br>
+        <span style="font-size:13.5px;color:var(--ink-faint)">Already have an account?
+          <a href="#" onclick="PBAuthModal.open('signin')" style="color:var(--ember)">Sign in</a>
+        </span>
+      </div>`;
+    return;
+  }
+
+  // Update header with user name
+  document.getElementById('dashTitle').textContent =
+    `Welcome back, ${user.email.split('@')[0]}`;
+
+  // Get plan
+  if (window.PB_CONFIGURED) {
+    const { data: profile } = await _sb.from('profiles').select('plan').eq('id', user.id).single();
+    if (profile) document.getElementById('statPlan').textContent =
+      profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1);
+  }
+
+  // Get saved problem IDs
+  let savedIds = [];
+  if (window.PB_CONFIGURED) {
+    savedIds = await PBData.getSavedIds();
+  }
+
+  // Get all problems (from Supabase or static fallback)
+  let allProblems = PROBLEMS;
+  if (window.PB_CONFIGURED) {
+    const { data } = await PBData.getProblems();
+    if (data && data.length) allProblems = data;
+  }
+
+  renderSaved(savedIds, allProblems);
+}
+
+// Si Supabase non configuré → affiche état démo avec données statiques
+if (!window.PB_CONFIGURED) {
+  document.getElementById('dashTitle').textContent = 'Your dashboard';
+  document.getElementById('statSaved').textContent  = '3';
+  document.getElementById('statThemes').textContent = '2';
+  // Simule 3 problèmes sauvegardés avec les données statiques
+  const demoIds = ['invoice-chasing', 'weekend-recurring-tasks', 'lecture-notes'];
+  renderSaved(demoIds, PROBLEMS);
+} else {
+  PBAuth.onAuthChange(() => loadSaved());
+  loadSaved();
+}
+</script>
+</body>
+</html>

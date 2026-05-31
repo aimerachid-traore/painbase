@@ -1,0 +1,18 @@
+{
+  "name": "painbase-pipeline",
+  "version": "1.0.0",
+  "description": "Reddit + HN data collection pipeline for PainBase",
+  "type": "module",
+  "scripts": {
+    "seed":    "node seed.js",
+    "collect": "node collect.js",
+    "cluster": "node cluster.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.43.0",
+    "@anthropic-ai/sdk": "^0.20.0",
+    "snoowrap": "^1.23.0",
+    "dotenv": "^16.4.0",
+    "node-fetch": "^3.3.2"
+  }
+}

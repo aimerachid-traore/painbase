@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PainBase — The database of real problems worth solving</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth-ui.css">
+<link rel="stylesheet" href="mobile-nav.css">
+<style>
+  :root{
+    --bg:#100E0B;
+    --bg-2:#16130F;
+    --panel:#1B1712;
+    --panel-2:#211C16;
+    --line:#312A22;
+    --line-soft:#241F19;
+    --ink:#F3ECDF;
+    --ink-dim:#A89C89;
+    --ink-faint:#6F6557;
+    --ember:#FF5C38;
+    --ember-soft:rgba(255,92,56,.14);
+    --gold:#F0A92B;
+    --green:#79C58A;
+    --maxw:1180px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Archivo',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    line-height:1.5;
+  }
+  /* grain */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:'JetBrains Mono',monospace}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(16,14,11,.78);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line-soft);
+  }
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+  .logo .mark{
+    width:26px;height:26px;border-radius:7px;background:var(--ember);position:relative;flex:none;
+    box-shadow:0 0 0 4px var(--ember-soft);
+  }
+  .logo .mark::after{content:"";position:absolute;inset:0;border-radius:7px;
+    background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.5),transparent 60%)}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{color:var(--ink-dim);font-size:14.5px;font-weight:500;transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{display:flex;align-items:center;gap:16px}
+  .btn{
+    font-family:'Archivo';font-weight:600;font-size:14.5px;border:none;cursor:pointer;
+    padding:10px 18px;border-radius:9px;transition:transform .15s,box-shadow .2s,background .2s;
+  }
+  .btn-primary{background:var(--ember);color:#1a0d08}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px -8px var(--ember)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--ink-dim)}
+  @media(max-width:860px){.nav-links{display:none}}
+
+  /* ---------- HERO ---------- */
+  header{position:relative;padding:88px 0 56px;overflow:hidden}
+  header::before{
+    content:"";position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+    width:900px;height:600px;z-index:0;
+    background:radial-gradient(ellipse at center,var(--ember-soft),transparent 62%);
+    filter:blur(20px);
+  }
+  .live{
+    display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-dim);border:1px solid var(--line);
+    padding:6px 13px;border-radius:100px;background:var(--panel);
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);position:relative}
+  .dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:var(--green);
+    opacity:.4;animation:ping 1.8s ease-out infinite}
+  @keyframes ping{0%{transform:scale(1);opacity:.4}80%,100%{transform:scale(2.6);opacity:0}}
+  h1{
+    font-family:'Fraunces';font-weight:600;font-size:clamp(40px,6.4vw,76px);
+    line-height:1.02;letter-spacing:-.025em;margin:26px 0 0;max-width:14ch;
+  }
+  h1 em{font-style:italic;color:var(--ember)}
+  .sub{font-size:clamp(16px,2vw,19.5px);color:var(--ink-dim);max-width:54ch;margin-top:22px}
+  .sub b{color:var(--ink);font-weight:600}
+
+  /* search */
+  .searchbar{
+    margin-top:34px;display:flex;align-items:center;gap:10px;
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:8px 8px 8px 18px;max-width:620px;transition:border-color .2s,box-shadow .2s;
+  }
+  .searchbar:focus-within{border-color:var(--ember);box-shadow:0 0 0 4px var(--ember-soft)}
+  .searchbar svg{flex:none;color:var(--ink-faint)}
+  .searchbar input{
+    flex:1;background:none;border:none;outline:none;color:var(--ink);
+    font-family:'Archivo';font-size:16px;
+  }
+  .searchbar input::placeholder{color:var(--ink-faint)}
+  .stats{display:flex;gap:34px;margin-top:30px;flex-wrap:wrap}
+  .stat .num{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--ink)}
+  .stat .lbl{font-size:12.5px;color:var(--ink-faint);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+
+  /* ---------- THEMES ---------- */
+  section{padding:18px 0}
+  .themes{display:flex;gap:9px;flex-wrap:wrap;padding:38px 0 6px}
+  .chip{
+    font-family:'JetBrains Mono';font-size:12.5px;font-weight:500;
+    padding:8px 14px;border-radius:100px;border:1px solid var(--line);
+    background:var(--bg-2);color:var(--ink-dim);cursor:pointer;
+    transition:all .16s;white-space:nowrap;
+  }
+  .chip:hover{border-color:var(--ink-faint);color:var(--ink)}
+  .chip.active{background:var(--ember);color:#1a0d08;border-color:var(--ember);font-weight:700}
+
+  /* section heads */
+  .shead{display:flex;align-items:baseline;justify-content:space-between;
+    margin:46px 0 22px;border-bottom:1px solid var(--line-soft);padding-bottom:14px}
+  .shead h2{font-family:'Fraunces';font-size:25px;font-weight:600;letter-spacing:-.01em}
+  .shead .meta{font-family:'JetBrains Mono';font-size:12.5px;color:var(--ink-faint)}
+
+  /* ---------- CARDS ---------- */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .card{
+    background:var(--panel);border:1px solid var(--line-soft);border-radius:15px;
+    padding:20px;cursor:pointer;transition:transform .18s,border-color .18s,background .18s;
+    display:flex;flex-direction:column;min-height:208px;position:relative;overflow:hidden;
+  }
+  .card:hover{transform:translateY(-3px);border-color:var(--ember);background:var(--panel-2)}
+  .card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+  .tag{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--gold);padding:4px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg-2)}
+  .trend{font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:4px}
+  .card h3{font-family:'Fraunces';font-weight:500;font-size:18.5px;line-height:1.22;letter-spacing:-.01em}
+  .card .ai{font-size:13.5px;color:var(--ink-dim);margin-top:10px;line-height:1.45;flex:1}
+  .card .ai .badge{font-family:'JetBrains Mono';font-size:10px;color:var(--ember);
+    border:1px solid var(--ember);border-radius:4px;padding:1px 5px;margin-right:6px;vertical-align:middle}
+  .card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:16px;
+    padding-top:13px;border-top:1px solid var(--line-soft)}
+  .mentions{font-family:'JetBrains Mono';font-size:13px;color:var(--ink)}
+  .mentions span{color:var(--ink-faint)}
+  .srcs{display:flex;gap:5px}
+  .src{font-family:'JetBrains Mono';font-size:10px;color:var(--ink-faint);
+    border:1px solid var(--line);border-radius:5px;padding:2px 6px}
+  .intensity{position:absolute;top:0;right:0;width:46px;height:46px;overflow:hidden}
+  .intensity::after{content:"";position:absolute;top:-23px;right:-23px;width:46px;height:46px;
+    transform:rotate(45deg);background:var(--ember);opacity:.0}
+  .card.hot .intensity::after{opacity:.9}
+  .empty{grid-column:1/-1;text-align:center;color:var(--ink-faint);padding:50px 0;font-family:'JetBrains Mono';font-size:14px}
+
+  /* ---------- LEADERBOARD ---------- */
+  .board{border:1px solid var(--line-soft);border-radius:15px;overflow:hidden;background:var(--panel)}
+  .row{display:grid;grid-template-columns:46px 1fr 130px 96px 80px;gap:14px;align-items:center;
+    padding:15px 22px;border-bottom:1px solid var(--line-soft);transition:background .15s}
+  .row:last-child{border-bottom:none}
+  .row:hover{background:var(--panel-2)}
+  .row.head{background:var(--bg-2);color:var(--ink-faint);font-family:'JetBrains Mono';
+    font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  .rank{font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:var(--ink-faint)}
+  .rank.top{color:var(--ember)}
+  .row .p-name{font-weight:500;font-size:15px}
+  .row .p-theme{font-family:'JetBrains Mono';font-size:11px;color:var(--gold);margin-top:3px}
+  .row .p-mentions{font-family:'JetBrains Mono';font-size:14px}
+  .row .p-trend{font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--green)}
+  .row .p-bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+  .row .p-bar i{display:block;height:100%;background:var(--ember);border-radius:3px}
+  @media(max-width:760px){
+    .row{grid-template-columns:38px 1fr 70px;gap:10px;padding:13px 16px}
+    .row .p-mentions-col,.row .col-bar{display:none}
+  }
+
+  /* ---------- HOW ---------- */
+  .how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.how{grid-template-columns:1fr}}
+  .step{border:1px solid var(--line-soft);border-radius:15px;padding:26px;background:var(--bg-2)}
+  .step .n{font-family:'JetBrains Mono';font-size:13px;color:var(--ember);font-weight:700}
+  .step h4{font-family:'Fraunces';font-size:20px;font-weight:600;margin:14px 0 8px;letter-spacing:-.01em}
+  .step p{font-size:14.5px;color:var(--ink-dim);line-height:1.55}
+
+  /* ---------- CTA ---------- */
+  .cta{margin:64px 0 40px;border:1px solid var(--line);border-radius:22px;
+    background:linear-gradient(160deg,var(--panel-2),var(--bg-2));padding:60px 40px;text-align:center;position:relative;overflow:hidden}
+  .cta::before{content:"";position:absolute;bottom:-160px;left:50%;transform:translateX(-50%);
+    width:600px;height:340px;background:radial-gradient(ellipse,var(--ember-soft),transparent 65%)}
+  .cta h2{font-family:'Fraunces';font-size:clamp(28px,4vw,42px);font-weight:600;letter-spacing:-.02em;position:relative}
+  .cta p{color:var(--ink-dim);margin:16px auto 28px;max-width:46ch;position:relative;font-size:16px}
+  .cta .btn{position:relative;padding:13px 26px;font-size:15.5px}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line-soft);padding:40px 0 60px;color:var(--ink-faint)}
+  .foot-in{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;align-items:center}
+  .foot-links{display:flex;gap:24px;flex-wrap:wrap}
+  .foot-links a{font-size:13.5px;color:var(--ink-faint);transition:color .2s}
+  .foot-links a:hover{color:var(--ink-dim)}
+  .foot-note{font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint)}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(16px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="#" class="logo"><span class="mark"></span>PainBase</a>
+    <div class="nav-links">
+      <a href="#explore">Browse problems</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#how">How it works</a>
+      <a href="#">Pricing</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="pb-signin-trigger" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">Sign in</a>
+      <button class="btn btn-primary pb-signup-trigger">Start hunting</button>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="live rv" style="animation-delay:.05s"><span class="dot"></span>Listening to the internet · updated hourly</span>
+    <h1 class="rv" style="animation-delay:.12s">The database of <em>real problems</em> worth solving.</h1>
+    <p class="sub rv" style="animation-delay:.2s">PainBase mines Reddit, Hacker News & forums for the things people <b>actually complain about</b> — then clusters them into validated, fundable problems. Stop guessing what to build.</p>
+
+    <div class="searchbar rv" style="animation-delay:.28s">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="text" placeholder="Search a problem, e.g. “invoices”, “sleep”, “onboarding”…" autocomplete="off">
+      <button class="btn btn-primary" style="flex:none">Search</button>
+    </div>
+
+    <div class="stats rv" style="animation-delay:.36s">
+      <div class="stat"><div class="num" id="ct1" data-to="48213">0</div><div class="lbl">problems tracked</div></div>
+      <div class="stat"><div class="num" id="ct2" data-to="6">0</div><div class="lbl">sources mined</div></div>
+      <div class="stat"><div class="num" id="ct3" data-to="312000">0</div><div class="lbl">posts analysed</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="explore">
+  <div class="wrap">
+    <div class="themes" id="themes">
+      <button class="chip active" data-theme="all">All themes</button>
+      <button class="chip" data-theme="Productivity">Productivity</button>
+      <button class="chip" data-theme="Health & Fitness">Health &amp; Fitness</button>
+      <button class="chip" data-theme="Personal Finance">Personal Finance</button>
+      <button class="chip" data-theme="Parenting">Parenting</button>
+      <button class="chip" data-theme="Developer Tools">Developer Tools</button>
+      <button class="chip" data-theme="Marketing">Marketing</button>
+      <button class="chip" data-theme="Education">Education</button>
+      <button class="chip" data-theme="Pets">Pets</button>
+    </div>
+
+    <div class="shead">
+      <h2>Trending pain points</h2>
+      <span class="meta" id="resultCount">—</span>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section id="leaderboard">
+  <div class="wrap">
+    <div class="shead">
+      <h2>Most complained-about · this week</h2>
+      <span class="meta">ranked by verified mentions</span>
+    </div>
+    <div class="board" id="board">
+      <div class="row head">
+        <div>#</div><div>Problem</div><div class="p-mentions-col">Mentions</div><div>Growth</div><div class="col-bar">Volume</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="shead"><h2>How PainBase works</h2><span class="meta">listen → cluster → surface</span></div>
+    <div class="how">
+      <div class="step">
+        <div class="n">01 / LISTEN</div>
+        <h4>We never stop scraping</h4>
+        <p>Workers continuously pull posts & comments from Reddit, Hacker News and forums where people vent about unsolved problems.</p>
+      </div>
+      <div class="step">
+        <div class="n">02 / CLUSTER</div>
+        <h4>AI groups the noise</h4>
+        <p>Every post is classified, de-duplicated and clustered by embeddings, so 230 separate rants become one quantified problem.</p>
+      </div>
+      <div class="step">
+        <div class="n">03 / SURFACE</div>
+        <h4>You get the brief</h4>
+        <p>For each problem, the AI writes a summary, scores demand & competition, and suggests a product angle you could actually ship.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta">
+      <h2>Your next idea is already a complaint.</h2>
+      <p>Thousands of people are describing problems they'd pay to fix. PainBase hands them to you, validated and sorted.</p>
+      <button class="btn btn-primary">Start hunting — free</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <a href="#" class="logo" style="font-size:17px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
+      <div class="foot-note" style="margin-top:10px">Real problems, mined hourly. Built for builders.</div>
+    </div>
+    <div class="foot-links">
+      <a href="#explore">Browse</a><a href="#leaderboard">Leaderboard</a><a href="#how">How it works</a>
+      <a href="#">Pricing</a><a href="#">API</a><a href="#">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Supabase SDK + config -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="problems-data.js"></script><!-- fallback si Supabase non configuré -->
+<script src="auth-ui.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+  const grid = document.getElementById('grid');
+  const board = document.getElementById('board');
+  const chips = document.getElementById('themes');
+  const search = document.getElementById('search');
+  const resultCount = document.getElementById('resultCount');
+  let activeTheme = 'all';
+  let _problems = PROBLEMS; // source par défaut (statique)
+
+  const fmt = n => n.toLocaleString('en-US');
+
+  // Normalise un problème Supabase ou statique vers la même forme
+  function normalize(p){
+    return p.title ? {  // vient de Supabase
+      id:p.id, t:p.title, theme:p.theme, mentions:p.mentions,
+      trend:p.trend_pct, src:[], hot:p.is_hot, ai:p.ai_brief||''
+    } : p; // déjà au format statique
+  }
+
+  function render(){
+    const q = search.value.trim().toLowerCase();
+    const list = _problems.map(normalize).filter(p=>{
+      const okTheme = activeTheme==='all' || p.theme===activeTheme;
+      const okQ = !q || p.t.toLowerCase().includes(q) || p.theme.toLowerCase().includes(q) || p.ai.toLowerCase().includes(q);
+      return okTheme && okQ;
+    });
+    resultCount.textContent = list.length + (list.length===1?' problem':' problems');
+    grid.innerHTML = list.length ? list.map(p=>`
+      <a class="card ${p.hot?'hot':''}" href="painbase-detail.html#id=${p.id}" style="text-decoration:none;color:inherit">
+        <div class="intensity"></div>
+        <div class="card-top">
+          <span class="tag">${p.theme}</span>
+          <span class="trend">▲ ${p.trend}%</span>
+        </div>
+        <h3>${p.t}</h3>
+        <p class="ai"><span class="badge">AI</span>${p.ai}</p>
+        <div class="card-foot">
+          <span class="mentions">${fmt(p.mentions)} <span>mentions</span></span>
+          ${p.src.length?`<span class="srcs">${p.src.map(s=>`<span class="src">${s}</span>`).join('')}</span>`:''}
+        </div>
+      </a>`).join('') : `<div class="empty">No problems match that filter — try another theme.</div>`;
+  }
+
+  function renderBoard(){
+    const src = _problems.map(normalize);
+    const ranked = [...src].sort((a,b)=>b.mentions-a.mentions).slice(0,8);
+    const max = ranked[0].mentions;
+    board.querySelectorAll('a.row').forEach(r=>r.remove());
+    ranked.forEach((p,i)=>{
+      const row = document.createElement('a');
+      row.className='row';
+      row.href=`painbase-detail.html#id=${p.id}`;
+      row.style.cssText='text-decoration:none;color:inherit;display:grid;grid-template-columns:46px 1fr 130px 96px 80px;gap:14px;align-items:center;padding:15px 22px;border-bottom:1px solid var(--line-soft);transition:background .15s;cursor:pointer';
+      row.innerHTML=`
+        <div class="rank ${i<3?'top':''}">${i+1}</div>
+        <div><div class="p-name">${p.t}</div><div class="p-theme">${p.theme}</div></div>
+        <div class="p-mentions-col"><span class="p-mentions">${fmt(p.mentions)}</span></div>
+        <div><span class="p-trend">▲${p.trend}%</span></div>
+        <div class="col-bar"><div class="p-bar"><i style="width:${Math.round(p.mentions/max*100)}%"></i></div></div>`;
+      board.appendChild(row);
+    });
+  }
+
+  chips.addEventListener('click',e=>{
+    if(!e.target.classList.contains('chip'))return;
+    chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    e.target.classList.add('active');
+    activeTheme=e.target.dataset.theme;
+    render();
+  });
+  search.addEventListener('input',render);
+
+  // Charge depuis Supabase si configuré, sinon garde les données statiques
+  async function loadData(){
+    if(!window.PB_CONFIGURED) return;
+    const {data, error} = await PBData.getProblems();
+    if(!error && data && data.length){
+      _problems = data;
+      render();
+      renderBoard();
+    }
+  }
+  loadData();
+
+  // count-up
+  function countUp(el){
+    const to=+el.dataset.to; const dur=1200; const start=performance.now();
+    function tick(now){
+      const k=Math.min(1,(now-start)/dur);
+      const v=Math.floor((1-Math.pow(1-k,3))*to);
+      el.textContent = to>=1000 ? (v>=1000?fmt(v):v) : v;
+      if(k<1)requestAnimationFrame(tick);
+      else el.textContent = to>=100000 ? fmt(to).replace(/,000$/,'k+').replace(/(\d+),(\d{3})$/,'$1$2') : fmt(to);
+    }
+    requestAnimationFrame(tick);
+  }
+  document.getElementById('ct3').dataset.to=312000;
+  ['ct1','ct2','ct3'].forEach(id=>countUp(document.getElementById(id)));
+  setTimeout(()=>{document.getElementById('ct1').textContent='48,213';document.getElementById('ct3').textContent='312k+';},1300);
+
+  render();
+  renderBoard();
+</script>
+</body>
+</html>

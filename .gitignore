@@ -1,0 +1,4 @@
+node_modules/
+pipeline/.env
+pipeline/.env.local
+.claude/

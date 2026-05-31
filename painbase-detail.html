@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PainBase — Problem detail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="auth-ui.css">
+<link rel="stylesheet" href="mobile-nav.css">
+<style>
+  :root{
+    --bg:#100E0B;--bg-2:#16130F;--panel:#1B1712;--panel-2:#211C16;
+    --line:#312A22;--line-soft:#241F19;--ink:#F3ECDF;--ink-dim:#A89C89;
+    --ink-faint:#6F6557;--ember:#FF5C38;--ember-soft:rgba(255,92,56,.14);
+    --gold:#F0A92B;--green:#79C58A;--maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+  a{color:inherit;text-decoration:none}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-soft)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:19px;letter-spacing:-.02em}
+  .logo .mark{width:26px;height:26px;border-radius:7px;background:var(--ember);position:relative;flex:none;box-shadow:0 0 0 4px var(--ember-soft)}
+  .logo .mark::after{content:"";position:absolute;inset:0;border-radius:7px;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.5),transparent 60%)}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{color:var(--ink-dim);font-size:14.5px;font-weight:500;transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .btn{font-family:'Archivo';font-weight:600;font-size:14.5px;border:none;cursor:pointer;padding:10px 18px;border-radius:9px;transition:transform .15s,box-shadow .2s,background .2s}
+  .btn-primary{background:var(--ember);color:#1a0d08}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px -8px var(--ember)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--ink-dim)}
+  .btn-save{display:flex;align-items:center;gap:7px;background:var(--panel-2);color:var(--ink-dim);border:1px solid var(--line);font-family:'Archivo';font-weight:600;font-size:13.5px;cursor:pointer;padding:9px 16px;border-radius:9px;transition:all .18s}
+  .btn-save:hover{border-color:var(--gold);color:var(--gold)}
+  .btn-save.saved{border-color:var(--gold);color:var(--gold);background:rgba(240,169,43,.08)}
+  @media(max-width:860px){.nav-links{display:none}}
+
+  /* BREADCRUMB */
+  .breadcrumb{display:flex;align-items:center;gap:8px;padding:22px 0 0;font-family:'JetBrains Mono';font-size:12.5px;color:var(--ink-faint)}
+  .breadcrumb a{color:var(--ink-faint);transition:color .15s}
+  .breadcrumb a:hover{color:var(--ink-dim)}
+  .breadcrumb span{color:var(--line)}
+
+  /* HERO */
+  .detail-hero{padding:28px 0 38px;position:relative}
+  .detail-hero::before{content:"";position:absolute;top:-120px;right:-200px;width:600px;height:400px;z-index:0;background:radial-gradient(ellipse at center,var(--ember-soft),transparent 62%);filter:blur(30px);pointer-events:none}
+  .hero-meta{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .tag{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--gold);padding:5px 11px;border:1px solid var(--line);border-radius:6px;background:var(--bg-2)}
+  .badge-hot{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ember);padding:4px 9px;border:1px solid var(--ember);border-radius:6px;background:var(--ember-soft)}
+  .detail-hero h1{font-family:'Fraunces';font-weight:600;font-size:clamp(26px,4vw,42px);line-height:1.1;letter-spacing:-.025em;max-width:22ch;position:relative}
+  .hero-stats{display:flex;gap:36px;margin-top:28px;flex-wrap:wrap;position:relative}
+  .hstat .num{font-family:'JetBrains Mono';font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--ink),var(--ink-dim));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hstat .num.up{background:linear-gradient(135deg,var(--green),#a8e4b5);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hstat .num.gold{background:linear-gradient(135deg,var(--gold),#f0c96a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hstat .lbl{font-size:12px;color:var(--ink-faint);letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
+  .hero-actions{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap;position:relative}
+
+  /* LAYOUT */
+  .detail-body{display:grid;grid-template-columns:1fr 320px;gap:24px;padding-bottom:80px}
+  @media(max-width:900px){.detail-body{grid-template-columns:1fr}}
+  .col-main{display:flex;flex-direction:column;gap:20px;min-width:0}
+  .col-side{display:flex;flex-direction:column;gap:20px}
+
+  /* PANELS */
+  .panel{background:var(--panel);border:1px solid var(--line-soft);border-radius:16px;padding:24px}
+  .panel-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line-soft);padding-bottom:14px;margin-bottom:20px}
+  .panel-head h2{font-family:'Fraunces';font-size:19px;font-weight:600;letter-spacing:-.01em}
+  .panel-head .meta{font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint)}
+
+  /* AI */
+  .ai-body{font-size:15.5px;color:var(--ink-dim);line-height:1.65}
+  .ai-body p+p{margin-top:14px}
+  .ai-body strong{color:var(--ink);font-weight:600}
+  .ai-body em{color:var(--ink-dim);font-style:italic}
+  .ai-highlight{margin-top:20px;border-left:3px solid var(--ember);padding:14px 18px;background:var(--ember-soft);border-radius:0 10px 10px 0;font-size:14.5px;color:var(--ink-dim);line-height:1.6}
+  .ai-highlight strong{color:var(--ink)}
+
+  /* CHART */
+  .chart-wrap{position:relative;height:160px;margin:0 -2px}
+  .chart-svg{width:100%;height:100%;overflow:visible}
+  .chart-grid line{stroke:var(--line-soft);stroke-dasharray:3 4}
+  .chart-area{fill:url(#areaGrad)}
+  .chart-line{fill:none;stroke:var(--ember);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .chart-labels{display:flex;justify-content:space-between;margin-top:8px;font-family:'JetBrains Mono';font-size:10.5px;color:var(--ink-faint)}
+  .tooltip{position:absolute;pointer-events:none;opacity:0;transition:opacity .15s;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono';font-size:12px;white-space:nowrap;transform:translate(-50%,-110%)}
+  .tooltip strong{color:var(--ember)}
+
+  /* SCORES */
+  .scores{display:flex;flex-direction:column;gap:16px}
+  .score-row{display:flex;flex-direction:column;gap:6px}
+  .score-label{display:flex;justify-content:space-between;font-size:13.5px}
+  .score-label span:first-child{color:var(--ink-dim)}
+  .score-label span:last-child{font-family:'JetBrains Mono';font-weight:700}
+  .score-bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+  .score-fill{height:100%;border-radius:4px;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+  .score-fill.demand{background:linear-gradient(90deg,var(--ember),#ff8a70)}
+  .score-fill.competition{background:linear-gradient(90deg,var(--gold),#f0c96a)}
+  .score-fill.opportunity{background:linear-gradient(90deg,var(--green),#a8e4b5)}
+  .verdict{margin-top:4px;padding:12px 15px;border-radius:10px;background:rgba(121,197,138,.1);border:1px solid rgba(121,197,138,.25);font-size:13.5px;color:var(--green);font-weight:600;text-align:center;opacity:0;transition:opacity .4s}
+
+  /* SOURCES */
+  .src-list{display:flex;flex-direction:column;gap:12px}
+  .src-card{border:1px solid var(--line-soft);border-radius:12px;padding:16px;background:var(--bg-2);cursor:pointer;transition:border-color .18s,background .18s}
+  .src-card:hover{border-color:var(--ember);background:var(--panel)}
+  .src-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .src-badge{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.04em;padding:3px 7px;border-radius:5px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink-faint)}
+  .src-badge.reddit{color:#FF6314;border-color:rgba(255,99,20,.3);background:rgba(255,99,20,.06)}
+  .src-badge.hn{color:#FF6600;border-color:rgba(255,102,0,.3);background:rgba(255,102,0,.06)}
+  .src-top .up{margin-left:auto;font-family:'JetBrains Mono';font-size:11.5px;color:var(--ink-faint);display:flex;align-items:center;gap:4px}
+  .src-top .up svg{color:var(--gold)}
+  .src-title{font-size:14px;font-weight:600;line-height:1.3;margin-bottom:6px}
+  .src-excerpt{font-size:13px;color:var(--ink-dim);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .src-foot{display:flex;justify-content:space-between;margin-top:10px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)}
+  .src-foot a{color:var(--ember);text-decoration:underline;text-underline-offset:2px}
+  .more-sources{text-align:center;padding:12px;font-family:'JetBrains Mono';font-size:12.5px;color:var(--ink-faint);cursor:pointer;transition:color .15s;border:1px dashed var(--line);border-radius:10px}
+  .more-sources:hover{color:var(--ember);border-color:var(--ember)}
+
+  /* COMPETITORS */
+  .comp-list{display:flex;flex-direction:column;gap:10px}
+  .comp-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line-soft);border-radius:10px;background:var(--bg-2);transition:border-color .18s}
+  .comp-row:hover{border-color:var(--line)}
+  .comp-icon{width:32px;height:32px;border-radius:8px;background:var(--panel);border:1px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;font-size:14px}
+  .comp-name{font-size:14px;font-weight:600}
+  .comp-desc{font-size:12.5px;color:var(--ink-faint);margin-top:2px}
+  .comp-gap{margin-left:auto;font-family:'JetBrains Mono';font-size:10.5px;padding:3px 8px;border-radius:5px;border:1px solid;white-space:nowrap}
+  .comp-gap.partial{color:var(--gold);border-color:rgba(240,169,43,.3);background:rgba(240,169,43,.06)}
+  .comp-gap.none{color:var(--green);border-color:rgba(121,197,138,.3);background:rgba(121,197,138,.06)}
+
+  /* SEGMENTS */
+  .seg-list{display:flex;flex-direction:column;gap:8px}
+  .seg-row{display:flex;align-items:center;gap:10px}
+  .seg-name{font-size:13.5px;color:var(--ink-dim);min-width:130px}
+  .seg-bar-wrap{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+  .seg-bar{height:100%;border-radius:3px;background:var(--ember);opacity:.7;width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+  .seg-pct{font-family:'JetBrains Mono';font-size:11.5px;color:var(--ink-faint);min-width:30px;text-align:right}
+
+  /* RELATED */
+  .related-list{display:flex;flex-direction:column;gap:8px}
+  .rel-card{padding:13px 15px;border:1px solid var(--line-soft);border-radius:10px;background:var(--bg-2);cursor:pointer;transition:border-color .18s,background .18s;display:block}
+  .rel-card:hover{border-color:var(--ember);background:var(--panel)}
+  .rel-card h4{font-family:'Fraunces';font-size:15px;font-weight:500;line-height:1.25;margin-bottom:5px}
+  .rel-meta{display:flex;gap:10px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)}
+  .rel-meta .up-trend{color:var(--green)}
+
+  /* NOT FOUND */
+  .not-found{text-align:center;padding:100px 28px;font-family:'JetBrains Mono';color:var(--ink-faint)}
+  .not-found h2{font-family:'Fraunces';font-size:32px;color:var(--ink);margin-bottom:14px}
+
+  /* REVEAL */
+  .rv{opacity:0;transform:translateY(12px);animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="painbase-landing.html" class="logo"><span class="mark"></span>PainBase</a>
+    <div class="nav-links">
+      <a href="painbase-landing.html#explore">Browse problems</a>
+      <a href="painbase-landing.html#leaderboard">Leaderboard</a>
+      <a href="painbase-landing.html#how">How it works</a>
+      <a href="#">Pricing</a>
+    </div>
+    <div class="nav-cta" style="display:flex;gap:16px;align-items:center">
+      <a href="#" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">Sign in</a>
+      <button class="btn btn-primary">Start hunting</button>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap" id="app">
+  <div style="padding:80px 0;text-align:center;font-family:'JetBrains Mono';color:var(--ink-faint)">Loading…</div>
+</div>
+
+<footer style="border-top:1px solid var(--line-soft);padding:40px 0 60px;color:var(--ink-faint)">
+  <div class="wrap" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;align-items:center">
+    <div>
+      <a href="painbase-landing.html" class="logo" style="font-size:17px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
+      <div style="font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint);margin-top:10px">Real problems, mined hourly. Built for builders.</div>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      <a href="painbase-landing.html#explore" style="font-size:13.5px;color:var(--ink-faint)">Browse</a>
+      <a href="painbase-landing.html#leaderboard" style="font-size:13.5px;color:var(--ink-faint)">Leaderboard</a>
+      <a href="#" style="font-size:13.5px;color:var(--ink-faint)">Pricing</a>
+      <a href="#" style="font-size:13.5px;color:var(--ink-faint)">API</a>
+      <a href="#" style="font-size:13.5px;color:var(--ink-faint)">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase.config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="problems-data.js"></script>
+<script src="auth-ui.js"></script>
+<script src="mobile-nav.js"></script>
+<script>
+const WEEKS = ['W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24','W25'];
+const fmt = n => n.toLocaleString('en-US');
+
+function getParam(name){
+  // support both ?id=X (production) and #id=X (local dev with serve)
+  const fromSearch = new URLSearchParams(window.location.search).get(name);
+  if(fromSearch) return fromSearch;
+  const hash = window.location.hash.slice(1); // remove #
+  return new URLSearchParams(hash).get(name);
+}
+
+function countUp(el, to){
+  const dur=1000; const start=performance.now();
+  function tick(now){
+    const k=Math.min(1,(now-start)/dur);
+    const v=Math.floor((1-Math.pow(1-k,3))*to);
+    el.textContent=fmt(v);
+    if(k<1) requestAnimationFrame(tick);
+    else el.textContent=fmt(to);
+  }
+  requestAnimationFrame(tick);
+}
+
+function buildChart(container, data){
+  const W=700, H=160, PAD={t:12,r:12,b:12,l:0};
+  const min=Math.min(...data)*0.88, max=Math.max(...data)*1.04;
+  const n=data.length;
+  const xs=data.map((_,i)=>PAD.l+i*(W-PAD.l-PAD.r)/(n-1));
+  const ys=data.map(v=>PAD.t+(1-(v-min)/(max-min))*(H-PAD.t-PAD.b));
+
+  const wrap=document.createElement('div');
+  wrap.className='chart-wrap';
+  wrap.style.position='relative';
+
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio','none');
+  svg.style.cssText='width:100%;height:160px;overflow:visible';
+
+  svg.innerHTML=`<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#FF5C38" stop-opacity=".22"/>
+    <stop offset="100%" stop-color="#FF5C38" stop-opacity="0"/>
+  </linearGradient></defs>`;
+
+  // grid
+  const gridG=document.createElementNS('http://www.w3.org/2000/svg','g');
+  [0,.25,.5,.75,1].forEach(t=>{
+    const y=PAD.t+t*(H-PAD.t-PAD.b);
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',PAD.l);l.setAttribute('x2',W-PAD.r);
+    l.setAttribute('y1',y);l.setAttribute('y2',y);
+    l.setAttribute('stroke','#241F19');l.setAttribute('stroke-dasharray','3 4');
+    gridG.appendChild(l);
+  });
+  svg.appendChild(gridG);
+
+  // area
+  let area=`M${xs[0]},${H-PAD.b} L${xs[0]},${ys[0]}`;
+  let line=`M${xs[0]},${ys[0]}`;
+  for(let i=1;i<n;i++){
+    const cx=(xs[i-1]+xs[i])/2;
+    area+=` C${cx},${ys[i-1]} ${cx},${ys[i]} ${xs[i]},${ys[i]}`;
+    line+=` C${cx},${ys[i-1]} ${cx},${ys[i]} ${xs[i]},${ys[i]}`;
+  }
+  area+=` L${xs[n-1]},${H-PAD.b} Z`;
+
+  const areaEl=document.createElementNS('http://www.w3.org/2000/svg','path');
+  areaEl.setAttribute('d',area);areaEl.setAttribute('fill','url(#areaGrad)');
+  svg.appendChild(areaEl);
+
+  const lineEl=document.createElementNS('http://www.w3.org/2000/svg','path');
+  lineEl.setAttribute('d',line);
+  lineEl.setAttribute('fill','none');lineEl.setAttribute('stroke','#FF5C38');
+  lineEl.setAttribute('stroke-width','2.2');lineEl.setAttribute('stroke-linecap','round');
+  svg.appendChild(lineEl);
+
+  // dots + tooltip
+  const tip=document.createElement('div');
+  tip.style.cssText='position:absolute;pointer-events:none;opacity:0;transition:opacity .15s;background:#211C16;border:1px solid #312A22;border-radius:8px;padding:8px 12px;font-family:"JetBrains Mono",monospace;font-size:12px;white-space:nowrap;transform:translate(-50%,-110%);color:#F3ECDF';
+
+  const dotsG=document.createElementNS('http://www.w3.org/2000/svg','g');
+  xs.forEach((x,i)=>{
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x);c.setAttribute('cy',ys[i]);
+    c.setAttribute('r',i===n-1?5:4);
+    c.setAttribute('fill','#FF5C38');c.setAttribute('stroke','#100E0B');c.setAttribute('stroke-width','2.5');
+    c.style.opacity=i===n-1?'1':'0';c.style.transition='opacity .15s';c.style.cursor='crosshair';
+    c.addEventListener('mouseenter',()=>{
+      c.style.opacity='1';
+      const svgRect=svg.getBoundingClientRect();
+      const wrapRect=wrap.getBoundingClientRect();
+      const px=svgRect.left-wrapRect.left+x*(svgRect.width/W);
+      const py=svgRect.top-wrapRect.top+ys[i]*(svgRect.height/H);
+      tip.style.left=px+'px';tip.style.top=py+'px';
+      tip.innerHTML=`<strong style="color:#FF5C38">${fmt(data[i])}</strong> mentions · ${WEEKS[i]}`;
+      tip.style.opacity='1';
+    });
+    c.addEventListener('mouseleave',()=>{
+      if(i!==n-1) c.style.opacity='0';
+      tip.style.opacity='0';
+    });
+    dotsG.appendChild(c);
+  });
+  svg.appendChild(dotsG);
+  wrap.appendChild(svg);
+  wrap.appendChild(tip);
+
+  // labels
+  const labelsEl=document.createElement('div');
+  labelsEl.className='chart-labels';
+  WEEKS.forEach((w,i)=>{
+    const s=document.createElement('span');
+    s.textContent=i%2===0?w:'';
+    labelsEl.appendChild(s);
+  });
+
+  container.appendChild(wrap);
+  container.appendChild(labelsEl);
+}
+
+function renderPage(p){
+  const d=p.detail;
+  document.title=`PainBase — ${p.t}`;
+
+  const related = getRelatedProblems(p.id, 3);
+
+  const app=document.getElementById('app');
+  app.innerHTML=`
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb rv" style="animation-delay:.05s">
+      <a href="painbase-landing.html">Problems</a>
+      <span>›</span>
+      <a href="painbase-landing.html">${p.theme}</a>
+      <span>›</span>
+      <span style="color:var(--ink-dim)">${d.subtitle}</span>
+    </div>
+
+    <!-- HERO -->
+    <div class="detail-hero rv" style="animation-delay:.1s">
+      <div class="hero-meta">
+        <span class="tag">${p.theme}</span>
+        ${p.hot?'<span class="badge-hot">🔥 Hot</span>':''}
+        <span style="font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint)">${d.problemId} · last updated ${d.updated}</span>
+      </div>
+      <h1>${p.t}</h1>
+      <div class="hero-stats">
+        <div class="hstat"><div class="num" id="ct-mentions">0</div><div class="lbl">Verified mentions</div></div>
+        <div class="hstat"><div class="num up">▲ ${p.trend}%</div><div class="lbl">Growth this week</div></div>
+        <div class="hstat"><div class="num" id="ct-posts">0</div><div class="lbl">Source posts</div></div>
+        <div class="hstat"><div class="num gold">${d.opportunityScore}/100</div><div class="lbl">Opportunity score</div></div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-primary">Explore product angles →</button>
+        <button class="btn-save" id="saveBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          Save problem
+        </button>
+        <button class="btn btn-ghost" style="font-size:13.5px;padding:9px 15px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:5px;vertical-align:-.1em"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share
+        </button>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="detail-body">
+      <div class="col-main">
+
+        <div class="panel rv" style="animation-delay:.15s">
+          <div class="panel-head"><h2>AI analysis</h2><span class="meta">Claude Sonnet · updated ${d.updated}</span></div>
+          <div class="ai-body" id="aiBody"></div>
+        </div>
+
+        <div class="panel rv" style="animation-delay:.2s">
+          <div class="panel-head"><h2>Mention trend</h2><span class="meta">weekly · last 12 weeks</span></div>
+          <div id="chartContainer"></div>
+        </div>
+
+        <div class="panel rv" style="animation-delay:.25s">
+          <div class="panel-head"><h2>Source posts</h2><span class="meta">showing 5 of ${d.sourcePosts}</span></div>
+          <div class="src-list" id="srcList"></div>
+          <div class="more-sources" style="margin-top:12px" id="moreBtn">Show more posts (${d.sourcePosts - 5} remaining)</div>
+        </div>
+
+      </div>
+      <div class="col-side">
+
+        <div class="panel rv" style="animation-delay:.18s">
+          <div class="panel-head"><h2>Opportunity scores</h2><span class="meta">0 – 100</span></div>
+          <div class="scores">
+            <div class="score-row">
+              <div class="score-label"><span>Demand intensity</span><span style="color:var(--ember)" id="s1">—</span></div>
+              <div class="score-bar"><div class="score-fill demand" id="sf1" style="width:0%"></div></div>
+            </div>
+            <div class="score-row">
+              <div class="score-label"><span>Competition density</span><span style="color:var(--gold)" id="s2">—</span></div>
+              <div class="score-bar"><div class="score-fill competition" id="sf2" style="width:0%"></div></div>
+            </div>
+            <div class="score-row">
+              <div class="score-label"><span>Opportunity gap</span><span style="color:var(--green)" id="s3">—</span></div>
+              <div class="score-bar"><div class="score-fill opportunity" id="sf3" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="verdict" id="verdict">⬆ ${d.verdict}</div>
+        </div>
+
+        <div class="panel rv" style="animation-delay:.22s">
+          <div class="panel-head"><h2>Who's complaining</h2><span class="meta">by segment</span></div>
+          <div class="seg-list" id="segList"></div>
+        </div>
+
+        <div class="panel rv" style="animation-delay:.26s">
+          <div class="panel-head"><h2>Existing solutions</h2><span class="meta">partial fits only</span></div>
+          <div class="comp-list" id="compList"></div>
+        </div>
+
+        ${related.length ? `
+        <div class="panel rv" style="animation-delay:.3s">
+          <div class="panel-head"><h2>Related problems</h2></div>
+          <div class="related-list" id="relatedList"></div>
+        </div>` : ''}
+
+      </div>
+    </div>
+  `;
+
+  // count-up
+  countUp(document.getElementById('ct-mentions'), p.mentions);
+  countUp(document.getElementById('ct-posts'), d.sourcePosts);
+
+  // save button
+  let saved=false;
+  const saveBtn=document.getElementById('saveBtn');
+  saveBtn.addEventListener('click',()=>{
+    saved=!saved;
+    saveBtn.classList.toggle('saved',saved);
+    saveBtn.innerHTML=saved
+      ?`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Saved`
+      :`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Save problem`;
+  });
+
+  // AI summary
+  const aiBody=document.getElementById('aiBody');
+  d.aiSummary.forEach(para=>{
+    const p2=document.createElement('p');p2.innerHTML=para;aiBody.appendChild(p2);
+  });
+  if(d.productAngle){
+    const hi=document.createElement('div');hi.className='ai-highlight';
+    hi.innerHTML=`<strong>Product angle:</strong> ${d.productAngle}`;
+    aiBody.appendChild(hi);
+  }
+
+  // chart
+  buildChart(document.getElementById('chartContainer'), d.weeklyData);
+
+  // scores
+  setTimeout(()=>{
+    const sc=d.scores;
+    const items=[{id:'s1',f:'sf1',v:sc.demand},{id:'s2',f:'sf2',v:sc.competition},{id:'s3',f:'sf3',v:sc.opportunity}];
+    items.forEach(({id,f,v},i)=>{
+      setTimeout(()=>{
+        document.getElementById(id).textContent=v+'/100';
+        document.getElementById(f).style.width=v+'%';
+      },i*120);
+    });
+    setTimeout(()=>{document.getElementById('verdict').style.opacity='1'},400);
+  },300);
+
+  // segments
+  const segList=document.getElementById('segList');
+  d.segments.forEach(s=>{
+    const el=document.createElement('div');el.className='seg-row';
+    el.innerHTML=`<span class="seg-name">${s.name}</span><div class="seg-bar-wrap"><div class="seg-bar" data-w="${s.pct}%"></div></div><span class="seg-pct">${s.pct}%</span>`;
+    segList.appendChild(el);
+  });
+  setTimeout(()=>{document.querySelectorAll('.seg-bar').forEach(b=>{b.style.width=b.dataset.w})},400);
+
+  // competitors
+  const compList=document.getElementById('compList');
+  d.competitors.forEach(c=>{
+    const el=document.createElement('div');el.className='comp-row';
+    el.innerHTML=`<div class="comp-icon">${c.icon}</div><div><div class="comp-name">${c.name}</div><div class="comp-desc">${c.desc}</div></div><span class="comp-gap ${c.gap}">${c.gap==='none'?'Gap ✓':'Partial'}</span>`;
+    compList.appendChild(el);
+  });
+
+  // source posts
+  const srcList=document.getElementById('srcList');
+  d.sources.forEach(s=>{
+    const el=document.createElement('div');el.className='src-card';
+    el.innerHTML=`
+      <div class="src-top">
+        <span class="src-badge ${s.platform}">${s.platform==='reddit'?'Reddit':'HN'} · ${s.sub}</span>
+        <span class="up"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>${fmt(s.upvotes)}</span>
+      </div>
+      <div class="src-title">${s.title}</div>
+      <div class="src-excerpt">${s.excerpt}</div>
+      <div class="src-foot"><span>${s.comments} comments · ${s.date}</span><a href="${s.url}">View original →</a></div>`;
+    srcList.appendChild(el);
+  });
+  document.getElementById('moreBtn').addEventListener('click',function(){
+    this.textContent='Sign in to unlock all source posts';
+    this.style.color='var(--ember)';
+    this.style.borderColor='var(--ember)';
+  });
+
+  // related problems
+  if(related.length){
+    const relList=document.getElementById('relatedList');
+    related.forEach(r=>{
+      const el=document.createElement('a');
+      el.className='rel-card';
+      el.href=`painbase-detail.html#id=${r.id}`;
+      el.innerHTML=`<h4>${r.t}</h4><div class="rel-meta"><span>${fmt(r.mentions)} mentions</span><span class="up-trend">▲ ${r.trend}%</span><span style="color:var(--gold)">${r.theme}</span></div>`;
+      relList.appendChild(el);
+    });
+  }
+}
+
+function renderNotFound(){
+  document.getElementById('app').innerHTML=`
+    <div class="not-found rv">
+      <h2>Problem not found</h2>
+      <p>This problem doesn't exist or may have been removed.</p>
+      <a href="painbase-landing.html" class="btn btn-primary" style="display:inline-block;margin-top:24px">← Browse all problems</a>
+    </div>`;
+}
+
+// ── Adapte un problème Supabase vers le format attendu par renderPage ──
+function fromSupabase(d){
+  return {
+    id: d.id, t: d.title, theme: d.theme,
+    mentions: d.mentions, trend: d.trend_pct,
+    src: [], hot: d.is_hot, ai: d.ai_brief || '',
+    detail: {
+      subtitle:         d.subtitle || d.theme,
+      updated:          d.updated_at ? new Date(d.updated_at).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'recently',
+      problemId:        d.problem_code || d.id,
+      sourcePosts:      d.source_posts || 0,
+      opportunityScore: d.opportunity_score || 0,
+      weeklyData:       (d.weeklyData || []),
+      scores: {
+        demand:      d.score_demand      || 0,
+        competition: d.score_competition || 0,
+        opportunity: d.score_opportunity || 0
+      },
+      verdict:      d.verdict      || '',
+      aiSummary:    (d.summaries   || []).map(s=>s.content),
+      productAngle: d.product_angle || '',
+      segments:     (d.segments    || []).map(s=>({name:s.name, pct:s.percentage})),
+      competitors:  (d.competitors || []).map(c=>({icon:c.icon, name:c.name, desc:c.description, gap:c.gap_type})),
+      sources:      (d.sources     || []).map(s=>({
+        platform:s.platform, sub:s.subreddit, title:s.title,
+        excerpt:s.excerpt, upvotes:s.upvotes, comments:s.comments_count,
+        date:s.posted_at, url:s.url||'#'
+      }))
+    }
+  };
+}
+
+// INIT
+async function init(){
+  const id=getParam('id');
+  if(!id){ window.location.href='painbase-landing.html'; return; }
+
+  document.getElementById('app').innerHTML='<div style="padding:80px 0;text-align:center;font-family:\'JetBrains Mono\',monospace;color:var(--ink-faint)">Loading…</div>';
+  window.scrollTo(0,0);
+
+  // 1. Essaie Supabase
+  if(window.PB_CONFIGURED){
+    const {data, error} = await PBData.getProblem(id);
+    if(!error && data){
+      renderPage(fromSupabase(data));
+      return;
+    }
+  }
+
+  // 2. Fallback statique
+  const problem = getProblemById(id);
+  if(problem) renderPage(problem);
+  else renderNotFound();
+}
+
+window.addEventListener('hashchange', init);
+init();
+</script>
+</body>
+</html>
