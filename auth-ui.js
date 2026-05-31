@@ -211,20 +211,53 @@
       const initial = (user.email || 'U')[0].toUpperCase();
       const email   = user.email || '';
       cta.innerHTML = `
-        <div class="pb-user-chip" tabindex="0">
+        <div class="pb-user-chip" tabindex="0" id="pbChip">
           <div class="avatar">${initial}</div>
           <span>${email.split('@')[0]}</span>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-          <div class="pb-user-menu">
-            <a href="#">My saved problems</a>
-            <a href="#">Dashboard</a>
+          <span class="arrow">▾</span>
+          <div class="pb-user-menu" id="pbMenu">
+            <a href="painbase-dashboard.html">My saved problems</a>
+            <a href="painbase-dashboard.html">Dashboard</a>
             <div class="divider"></div>
             <a class="signout" id="pbSignOut">Sign out</a>
           </div>
         </div>`;
-      document.getElementById('pbSignOut')?.addEventListener('click', async () => {
+
+      // Click-toggle (remplace hover — fiable sur tous les navigateurs)
+      const chip = document.getElementById('pbChip');
+      const menu = document.getElementById('pbMenu');
+
+      chip.addEventListener('click', e => {
+        e.stopPropagation();
+        const isOpen = menu.classList.contains('open');
+        // Ferme tous les autres menus ouverts
+        document.querySelectorAll('.pb-user-menu.open').forEach(m => m.classList.remove('open'));
+        document.querySelectorAll('.pb-user-chip.open').forEach(c => c.classList.remove('open'));
+        if (!isOpen) {
+          menu.classList.add('open');
+          chip.classList.add('open');
+        }
+      });
+
+      // Ferme au clic en dehors
+      document.addEventListener('click', function closeMenu() {
+        menu.classList.remove('open');
+        chip.classList.remove('open');
+      });
+
+      // Ferme sur Escape
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          menu.classList.remove('open');
+          chip.classList.remove('open');
+        }
+      });
+
+      document.getElementById('pbSignOut')?.addEventListener('click', async e => {
+        e.stopPropagation();
         await PBAuth.signOut();
       });
+
     } else {
       cta.innerHTML = `
         <a href="#" class="pb-signin-trigger" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">Sign in</a>

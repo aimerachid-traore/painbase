@@ -89,16 +89,19 @@
 .pb-user-chip:hover{border-color:#6F6557}
 .pb-user-chip .avatar{width:22px;height:22px;border-radius:50%;background:#FF5C38;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1a0d08}
 
-/* dropdown */
+/* dropdown — click-toggle (pas hover, évite le bug de gap) */
 .pb-user-menu{
-  position:absolute;top:calc(100% + 8px);right:0;min-width:160px;
+  position:absolute;top:calc(100% + 6px);right:0;min-width:180px;
   background:#1B1712;border:1px solid #312A22;border-radius:11px;
   padding:6px;z-index:300;
-  opacity:0;pointer-events:none;transform:translateY(6px);transition:all .18s;
+  opacity:0;pointer-events:none;transform:translateY(8px);
+  transition:opacity .18s,transform .18s;
 }
-.pb-user-chip:hover .pb-user-menu,
-.pb-user-menu:hover{opacity:1;pointer-events:auto;transform:none}
-.pb-user-menu a{display:block;padding:9px 12px;font-family:'Archivo',sans-serif;font-size:13.5px;color:#A89C89;border-radius:7px;transition:background .15s,color .15s;cursor:pointer}
+.pb-user-menu.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+.pb-user-menu a{display:block;padding:9px 12px;font-family:'Archivo',sans-serif;font-size:13.5px;color:#A89C89;border-radius:7px;transition:background .15s,color .15s;cursor:pointer;text-decoration:none}
 .pb-user-menu a:hover{background:#211C16;color:#F3ECDF}
 .pb-user-menu .divider{height:1px;background:#241F19;margin:4px 0}
 .pb-user-menu .signout{color:#FF5C38}
+/* flèche indicateur */
+.pb-user-chip .arrow{font-size:10px;color:#6F6557;transition:transform .2s;display:inline-block}
+.pb-user-chip.open .arrow{transform:rotate(180deg)}
