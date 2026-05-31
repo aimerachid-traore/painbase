@@ -194,10 +194,12 @@
     });
 
     // ── Écoute les changements de session ──────────────────────
-    PBAuth.onAuthChange(user => _updateNavAuth(user));
-
-    // init état initial
-    PBAuth.getUser().then(user => _updateNavAuth(user));
+    if (typeof PBAuth !== 'undefined') {
+      PBAuth.onAuthChange(user => _updateNavAuth(user));
+      PBAuth.getUser().then(user => _updateNavAuth(user));
+    } else {
+      _updateNavAuth(null); // pas connecté — affiche Sign in / Start hunting
+    }
   }
 
   // ── Met à jour la nav selon l'état de connexion ───────────────

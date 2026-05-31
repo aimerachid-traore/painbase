@@ -97,8 +97,12 @@
     });
 
     // Update mob-auth based on user state
-    PBAuth.onAuthChange(user => _updateMobAuth(user));
-    PBAuth.getUser().then(user => _updateMobAuth(user));
+    if (typeof PBAuth !== 'undefined') {
+      PBAuth.onAuthChange(user => _updateMobAuth(user));
+      PBAuth.getUser().then(user => _updateMobAuth(user));
+    } else {
+      _updateMobAuth(null);
+    }
 
     function _updateMobAuth(user) {
       const mobAuth = document.getElementById('mobAuth');
