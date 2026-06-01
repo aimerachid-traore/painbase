@@ -23,18 +23,40 @@ const OK = {
   apify    : !!(process.env.APIFY_TOKEN?.length > 10),
 };
 
-if (!OK.supabase) { console.error('❌  SUPABASE_URL / SUPABASE_SERVICE_KEY manquant'); process.exit(1); }
+if (!OK.supabase) {
+  console.error('❌  SUPABASE_URL / SUPABASE_SERVICE_KEY manquant dans .env');
+  process.exit(1);
+}
+
+// Vérifie que la clé est bien la service_role (pas la clé anon)
+try {
+  const payload = JSON.parse(Buffer.from(process.env.SUPABASE_SERVICE_KEY.split('.')[1], 'base64').toString());
+  if (payload.role !== 'service_role') {
+    console.error('❌  SUPABASE_SERVICE_KEY est la clé "anon", pas "service_role".');
+    console.error('   → Va sur Supabase > Settings > API > service_role key');
+    console.error('   → Remplace SUPABASE_SERVICE_KEY dans pipeline/.env');
+    process.exit(1);
+  }
+} catch { /* si le JWT ne se parse pas, on laisse passer */ }
 
 const sb   = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const groq = OK.groq ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
+
+// ── Pré-check : connexion DB ────────────────────────────────────
+const { error: dbErr } = await sb.from('problems').select('id').limit(1);
+if (dbErr) {
+  console.error('❌  Impossible de lire la table "problems" :', dbErr.message);
+  console.error('   → Vérifie que tu as exécuté pipeline/schema.sql dans Supabase SQL Editor');
+  process.exit(1);
+}
 
 console.log('── Sources actives ──────────────────────────────────');
 console.log('  Reddit     ✓  (JSON public, sans clé)');
 console.log('  Hacker News✓  (Algolia, sans clé)');
 console.log('  Dev.to     ✓  (API publique, sans clé)');
 console.log(`  Twitter/X  ✓  (Nitter RSS, sans clé)`);
-console.log(`  Facebook   ${OK.apify ? '✓  (Apify)' : '✗  → ajouter APIFY_TOKEN'}`);
-console.log(`  IA Groq    ${OK.groq  ? '✓  (llama-3.1-8b-instant)' : '✗  → ajouter GROQ_API_KEY'}`);
+console.log(`  Facebook   ${OK.apify ? '✓  (Apify)' : '✗  → ajouter APIFY_TOKEN dans .env'}`);
+console.log(`  IA Groq    ${OK.groq  ? '✓  (llama-3.1-8b-instant)' : '✗  → ajouter GROQ_API_KEY dans .env'}`);
 console.log('─────────────────────────────────────────────────────\n');
 
 // ── Thèmes ───────────────────────────────────────────────────────
@@ -223,7 +245,10 @@ async function classify(post) {
         .replace('{SOURCE}',  post.subreddit) }]
     });
     return JSON.parse(c.choices[0].message.content);
-  } catch { return { is_problem:false }; }
+  } catch(err) {
+    process.stdout.write(`[Groq err: ${err.message.slice(0,40)}]`);
+    return { is_problem:false };
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -238,13 +263,15 @@ async function save(post, cls) {
   let pid;
   if (existing) {
     pid = existing.id;
-    await sb.from('problems').update({ mentions:existing.mentions+1, updated_at:new Date().toISOString() }).eq('id',pid);
+    const { error } = await sb.from('problems').update({ mentions:existing.mentions+1, updated_at:new Date().toISOString() }).eq('id',pid);
+    if (error) { process.stdout.write(`[DB err: ${error.message.slice(0,50)}]`); return; }
   } else {
     pid = cls.problem_title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
-    await sb.from('problems').upsert({
+    const { error } = await sb.from('problems').upsert({
       id:pid, title:cls.problem_title, theme:cls.theme, mentions:1,
       trend_pct:0, is_hot:false, ai_brief:cls.excerpt, source_posts:1
     },{ onConflict:'id' });
+    if (error) { process.stdout.write(`[DB err: ${error.message.slice(0,50)}]`); return; }
   }
   await sb.from('sources').upsert({
     problem_id:pid, platform:post.platform, subreddit:post.subreddit,
@@ -301,6 +328,7 @@ async function main() {
     const seen = new Set();
     const unique = all.filter(p=>p.raw_id && !seen.has(p.raw_id) && seen.add(p.raw_id));
     total += unique.length;
+    process.stdout.write(`${unique.length} posts collectés → analyse IA...\n  `);
 
     for (const post of unique) {
       const cls = await classify(post);
@@ -308,8 +336,11 @@ async function main() {
         await save(post, cls);
         stored++;
         process.stdout.write('✓');
+      } else {
+        process.stdout.write('·');
       }
     }
+    process.stdout.write('\n');
   }
 
   console.log(`\n\n✅  ${total} posts → ${stored} sauvegardés  (${Math.round((Date.now()-t0)/1000)}s)`);
