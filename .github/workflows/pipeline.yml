@@ -2,35 +2,27 @@ name: PainBase Data Pipeline
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # toutes les 6h
-  workflow_dispatch:          # lancement manuel
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: pipeline/package.json
-
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
         working-directory: pipeline
-
-      - name: Run pipeline
-        run: node collect.js
+      - run: node collect.js
         working-directory: pipeline
         env:
-          # Obligatoire
-          SUPABASE_URL:           ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY:   ${{ secrets.SUPABASE_SERVICE_KEY }}
-          # Recommandé (classification IA)
-          GROQ_API_KEY:           ${{ secrets.GROQ_API_KEY }}
-          # Optionnel (Twitter + Facebook + Instagram)
-          SOCIAL_SEARCHER_KEY:    ${{ secrets.SOCIAL_SEARCHER_KEY }}
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GROQ_API_KEY:         ${{ secrets.GROQ_API_KEY }}
+          APIFY_TOKEN:          ${{ secrets.APIFY_TOKEN }}
+          # Reddit, HN, Dev.to, Twitter (Nitter) = pas de secrets requis
