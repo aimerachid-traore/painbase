@@ -107,45 +107,77 @@ async function fetchHN(query) {
   } catch { return []; }
 }
 
-// ── Groq ───────────────────────────────────────────────────────
+// ── Groq — analyse complète ────────────────────────────────────
 async function analyzeWithGroq(query, posts, apiKey) {
   const postList = posts.slice(0, 20).map((p, i) =>
-    `${i+1}. [${p.platform.toUpperCase()}] (${p.upvotes} upvotes) ${p.title}`
-  ).join('\n');
+    `${i+1}. [${p.platform.toUpperCase()}] (${p.upvotes} upvotes) ${p.title}${p.excerpt ? '\n   "' + p.excerpt.slice(0,180) + '"' : ''}`
+  ).join('\n\n');
+
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant', max_tokens: 900, temperature: 0.2,
+        model: 'llama-3.1-8b-instant', max_tokens: 2000, temperature: 0.2,
         response_format: { type: 'json_object' },
         messages: [{ role: 'user', content:
-`Startup analyst. These are REAL posts about "${query}". Find 4-6 SaaS opportunities.
+`You are a senior startup analyst. Analyze these REAL posts about "${query}" and generate a complete SaaS opportunity report.
 
+POSTS:
 ${postList}
 
-JSON only:
-{"ideas":[{"title":"max 10 words","problem":"2 sentences real pain","opportunity":"1 sentence SaaS solution","confidence":0-100,"mentions":estimated_int}]}`
-        }]
+Return EXACTLY this JSON (no extra fields, all fields required):
+{
+  "ideas": [
+    {
+      "title": "10 words max — the core problem",
+      "problem": "2-3 sentences: what pain do people express in these posts?",
+      "opportunity": "2 sentences: what SaaS product solves this and how?",
+      "product_angle": "4-5 sentences: describe the product, target users, key features, pricing model ($X/month), why it beats existing tools",
+      "confidence": 78,
+      "mentions": 1200,
+      "score_demand": 75,
+      "score_competition": 40,
+      "score_opportunity": 72,
+      "verdict": "Strong opportunity — high demand, fragmented supply",
+      "summaries": [
+        "3-4 sentences: overview of the problem with data from the posts",
+        "3-4 sentences: current workarounds and why they fail",
+        "3-4 sentences: what users specifically ask for and willingness to pay signals"
+      ],
+      "segments": [
+        {"name": "Segment A", "pct": 45},
+        {"name": "Segment B", "pct": 35},
+        {"name": "Segment C", "pct": 20}
+      ],
+      "competitors": [
+        {"icon": "🔧", "name": "Tool name", "desc": "What it does and its gap", "gap": "partial"},
+        {"icon": "📊", "name": "Tool name", "desc": "What it does and its gap", "gap": "none"}
+      ]
+    }
+  ]
+}` }]
       }),
-      signal: AbortSignal.timeout(15000)
+      signal: AbortSignal.timeout(25000)
     });
     const data = await res.json();
     return JSON.parse(data?.choices?.[0]?.message?.content)?.ideas || [];
-  } catch { return []; }
+  } catch(e) { return []; }
 }
 
-// ── Sauvegarde Supabase ────────────────────────────────────────
+// ── Sauvegarde Supabase — complète ────────────────────────────
 async function saveToSupabase(query, ideas, posts, env) {
   const base = `${env.SUPABASE_URL}/rest/v1`;
-  const headers = {
+  const h = {
     'apikey': env.SUPABASE_SERVICE_KEY,
     'Authorization': `Bearer ${env.SUPABASE_SERVICE_KEY}`,
     'Content-Type': 'application/json',
-    'Prefer': 'resolution=ignore-duplicates'
+    'Prefer': 'return=minimal'
   };
+  const post = (path, body, extra={}) => fetch(`${base}/${path}`, {
+    method: 'POST', headers: { ...h, ...extra }, body: JSON.stringify(body)
+  });
 
-  // Détermine le thème dominant à partir des subreddits
   const theme = guessTheme(query, posts);
 
   for (const idea of ideas.slice(0, 3)) {
@@ -153,39 +185,63 @@ async function saveToSupabase(query, ideas, posts, env) {
       .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
     // Vérifie si le problème existe déjà
-    const check = await fetch(`${base}/problems?id=eq.${pid}&select=id,mentions`, { headers });
-    const existing = await check.json();
+    const check = await fetch(`${base}/problems?id=eq.${pid}&select=id,mentions`, { headers: h });
+    const existing = await check.json().catch(() => []);
 
-    if (existing?.length) {
-      // Met à jour le compteur
+    if (Array.isArray(existing) && existing.length) {
       await fetch(`${base}/problems?id=eq.${pid}`, {
-        method: 'PATCH', headers,
-        body: JSON.stringify({ mentions: (existing[0].mentions || 0) + 1, updated_at: new Date().toISOString() })
+        method: 'PATCH', headers: h,
+        body: JSON.stringify({ mentions: (existing[0].mentions||0)+1, updated_at: new Date().toISOString() })
       });
-    } else {
-      // Crée le nouveau problème
-      await fetch(`${base}/problems`, {
-        method: 'POST', headers,
-        body: JSON.stringify({
-          id: pid, title: idea.title, theme,
-          mentions: idea.mentions || 1, trend_pct: 0,
-          is_hot: false, ai_brief: idea.problem,
-          product_angle: idea.opportunity,
-          source_posts: posts.length
-        })
-      });
-
-      // Sauvegarde les sources
-      const srcBody = posts.slice(0, 5).map(p => ({
-        problem_id: pid, platform: p.platform, subreddit: p.subreddit,
-        title: p.title, excerpt: p.excerpt, upvotes: p.upvotes,
-        url: p.url, raw_id: p.raw_id, posted_at: new Date().toISOString()
-      }));
-      await fetch(`${base}/sources`, {
-        method: 'POST', headers: { ...headers, 'Prefer': 'resolution=ignore-duplicates' },
-        body: JSON.stringify(srcBody)
-      });
+      continue; // Déjà en base avec tous les détails
     }
+
+    // ── Crée le problème avec tous les scores ─────────────────
+    await post('problems', {
+      id: pid, title: idea.title, theme,
+      mentions: idea.mentions || 1, trend_pct: 0, is_hot: false,
+      ai_brief:           idea.problem,
+      product_angle:      idea.product_angle || idea.opportunity,
+      source_posts:       posts.length,
+      score_demand:       idea.score_demand      || 0,
+      score_competition:  idea.score_competition || 0,
+      score_opportunity:  idea.score_opportunity || 0,
+      opportunity_score:  idea.score_opportunity || 0,
+      verdict:            idea.verdict           || '',
+    }, { 'Prefer': 'resolution=ignore-duplicates' });
+
+    // ── Résumés IA (3 paragraphes) ────────────────────────────
+    if (Array.isArray(idea.summaries) && idea.summaries.length) {
+      await post('problem_summaries',
+        idea.summaries.map((content, i) => ({ problem_id: pid, content, position: i }))
+      );
+    }
+
+    // ── Segments ──────────────────────────────────────────────
+    if (Array.isArray(idea.segments) && idea.segments.length) {
+      await post('segments',
+        idea.segments.map((s, i) => ({ problem_id: pid, name: s.name, percentage: s.pct, position: i }))
+      );
+    }
+
+    // ── Compétiteurs ──────────────────────────────────────────
+    if (Array.isArray(idea.competitors) && idea.competitors.length) {
+      await post('competitors',
+        idea.competitors.map(c => ({
+          problem_id: pid, icon: c.icon||'🔧', name: c.name,
+          description: c.desc, gap_type: c.gap||'partial'
+        }))
+      );
+    }
+
+    // ── Sources ───────────────────────────────────────────────
+    const srcBody = posts.slice(0, 8).map(p => ({
+      problem_id: pid, platform: p.platform, subreddit: p.subreddit,
+      title: p.title, excerpt: p.excerpt||'', upvotes: p.upvotes||0,
+      url: p.url, raw_id: p.raw_id||String(Math.random()),
+      posted_at: new Date().toISOString()
+    }));
+    await post('sources', srcBody, { 'Prefer': 'resolution=ignore-duplicates' });
   }
 }
 

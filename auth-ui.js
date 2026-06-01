@@ -189,7 +189,10 @@
     $('btnGoogle').addEventListener('click', async () => {
       await _sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.href }
+        options: {
+          redirectTo: window.location.origin + '/painbase-landing.html',
+          queryParams: { access_type: 'offline', prompt: 'consent' }
+        }
       });
     });
 

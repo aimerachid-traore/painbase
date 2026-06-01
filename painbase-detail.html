@@ -561,10 +561,19 @@ function renderPage(p, related=[]){
       <div class="src-foot"><span>${s.comments} comments · ${s.date}</span>${s.url&&s.url!=='#'?`<a href="${s.url}" target="_blank" rel="noopener">View original →</a>`:''}</div>`;
     srcList.appendChild(el);
   });
-  document.getElementById('moreBtn').addEventListener('click',function(){
-    this.textContent='Sign in to unlock all source posts';
-    this.style.color='var(--ember)';
-    this.style.borderColor='var(--ember)';
+  document.getElementById('moreBtn').addEventListener('click', async function(){
+    const user = await PBAuth.getSession();
+    if (!user) {
+      this.textContent = 'Connecte-toi pour voir tous les posts sources →';
+      this.style.color = 'var(--ember)';
+      this.style.borderColor = 'var(--ember)';
+      setTimeout(() => PBAuthModal.open('signin'), 300);
+    } else {
+      this.textContent = `${d.sourcePosts} posts collectés au total — tout est affiché`;
+      this.style.color = 'var(--ink-faint)';
+      this.style.borderColor = 'var(--line)';
+      this.style.cursor = 'default';
+    }
   });
 
   // related problems
