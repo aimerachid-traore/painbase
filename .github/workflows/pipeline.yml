@@ -3,7 +3,7 @@ name: PainBase Data Pipeline
 on:
   schedule:
     - cron: '0 */6 * * *'   # toutes les 6h
-  workflow_dispatch:          # lancement manuel depuis Actions
+  workflow_dispatch:          # lancement manuel
 
 jobs:
   collect:
@@ -23,16 +23,14 @@ jobs:
         run: npm install
         working-directory: pipeline
 
-      - name: Run collector
+      - name: Run pipeline
         run: node collect.js
         working-directory: pipeline
         env:
-          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-          GROQ_API_KEY:         ${{ secrets.GROQ_API_KEY }}
-          # Reddit et HN : JSON public, pas de secrets requis
-
-# ── 2 secrets à ajouter dans GitHub → Settings → Secrets → Actions :
-#    SUPABASE_URL           → URL du projet Supabase
-#    SUPABASE_SERVICE_KEY   → service_role key (Settings → API)
-#    GROQ_API_KEY           → clé gratuite sur console.groq.com
+          # Obligatoire
+          SUPABASE_URL:           ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY:   ${{ secrets.SUPABASE_SERVICE_KEY }}
+          # Recommandé (classification IA)
+          GROQ_API_KEY:           ${{ secrets.GROQ_API_KEY }}
+          # Optionnel (Twitter + Facebook + Instagram)
+          SOCIAL_SEARCHER_KEY:    ${{ secrets.SOCIAL_SEARCHER_KEY }}
