@@ -105,21 +105,35 @@ ALTER TABLE saved_problems    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles          ENABLE ROW LEVEL SECURITY;
 
 -- Lecture publique (données visibles sans compte)
-CREATE POLICY IF NOT EXISTS "public_read_problems"   ON problems          FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read_summaries"  ON problem_summaries FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read_datapoints" ON weekly_datapoints  FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read_sources"    ON sources            FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read_competitors"ON competitors         FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "public_read_segments"   ON segments            FOR SELECT USING (true);
+DROP POLICY IF EXISTS "public_read_problems"    ON problems;
+DROP POLICY IF EXISTS "public_read_summaries"   ON problem_summaries;
+DROP POLICY IF EXISTS "public_read_datapoints"  ON weekly_datapoints;
+DROP POLICY IF EXISTS "public_read_sources"     ON sources;
+DROP POLICY IF EXISTS "public_read_competitors" ON competitors;
+DROP POLICY IF EXISTS "public_read_segments"    ON segments;
+
+CREATE POLICY "public_read_problems"    ON problems          FOR SELECT USING (true);
+CREATE POLICY "public_read_summaries"   ON problem_summaries FOR SELECT USING (true);
+CREATE POLICY "public_read_datapoints"  ON weekly_datapoints  FOR SELECT USING (true);
+CREATE POLICY "public_read_sources"     ON sources            FOR SELECT USING (true);
+CREATE POLICY "public_read_competitors" ON competitors         FOR SELECT USING (true);
+CREATE POLICY "public_read_segments"    ON segments            FOR SELECT USING (true);
 
 -- saved_problems : chaque user voit/modifie seulement ses favoris
-CREATE POLICY IF NOT EXISTS "saved_select" ON saved_problems FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY IF NOT EXISTS "saved_insert" ON saved_problems FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY IF NOT EXISTS "saved_delete" ON saved_problems FOR DELETE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "saved_select" ON saved_problems;
+DROP POLICY IF EXISTS "saved_insert" ON saved_problems;
+DROP POLICY IF EXISTS "saved_delete" ON saved_problems;
+
+CREATE POLICY "saved_select" ON saved_problems FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "saved_insert" ON saved_problems FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "saved_delete" ON saved_problems FOR DELETE USING (auth.uid() = user_id);
 
 -- profiles : chaque user voit/modifie son propre profil
-CREATE POLICY IF NOT EXISTS "profile_select" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY IF NOT EXISTS "profile_update" ON profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "profile_select" ON profiles;
+DROP POLICY IF EXISTS "profile_update" ON profiles;
+
+CREATE POLICY "profile_select" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "profile_update" ON profiles FOR UPDATE USING (auth.uid() = id);
 
 -- ── Trigger : crée le profil automatiquement à l'inscription ───
 
