@@ -3,22 +3,19 @@ name: PainBase Data Pipeline
 on:
   schedule:
     - cron: '0 */6 * * *'   # toutes les 6h
-  workflow_dispatch:          # lancement manuel
+  workflow_dispatch:          # lancement manuel depuis Actions
 
 jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    # Ne tourne que si les secrets Supabase sont configurés
-    if: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_SERVICE_KEY != '' }}
-
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'        # LTS — Node 20 déprécié sur GitHub Actions
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: pipeline/package.json
 
@@ -30,19 +27,12 @@ jobs:
         run: node collect.js
         working-directory: pipeline
         env:
-          SUPABASE_URL:           ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY:   ${{ secrets.SUPABASE_SERVICE_KEY }}
-          REDDIT_CLIENT_ID:       ${{ secrets.REDDIT_CLIENT_ID }}
-          REDDIT_CLIENT_SECRET:   ${{ secrets.REDDIT_CLIENT_SECRET }}
-          REDDIT_USERNAME:        ${{ secrets.REDDIT_USERNAME }}
-          REDDIT_PASSWORD:        ${{ secrets.REDDIT_PASSWORD }}
-          ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL:         ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GROQ_API_KEY:         ${{ secrets.GROQ_API_KEY }}
+          # Reddit et HN : JSON public, pas de secrets requis
 
-# ── Secrets à ajouter dans GitHub → Settings → Secrets and variables → Actions :
-#    SUPABASE_URL           → URL de ton projet Supabase
+# ── 2 secrets à ajouter dans GitHub → Settings → Secrets → Actions :
+#    SUPABASE_URL           → URL du projet Supabase
 #    SUPABASE_SERVICE_KEY   → service_role key (Settings → API)
-#    REDDIT_CLIENT_ID       → après approbation API Reddit
-#    REDDIT_CLIENT_SECRET   → après approbation API Reddit
-#    REDDIT_USERNAME        → ton compte Reddit
-#    REDDIT_PASSWORD        → mot de passe Reddit
-#    ANTHROPIC_API_KEY      → clé Claude (console.anthropic.com)
+#    GROQ_API_KEY           → clé gratuite sur console.groq.com

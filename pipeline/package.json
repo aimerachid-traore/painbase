@@ -5,13 +5,11 @@
   "type": "module",
   "scripts": {
     "seed":    "node seed.js",
-    "collect": "node collect.js",
-    "cluster": "node cluster.js"
+    "collect": "node collect.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.0",
-    "@anthropic-ai/sdk": "^0.20.0",
-    "snoowrap": "^1.23.0",
+    "groq-sdk": "^0.7.0",
     "dotenv": "^16.4.0",
     "node-fetch": "^3.3.2"
   }
