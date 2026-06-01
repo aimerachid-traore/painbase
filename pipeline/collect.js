@@ -50,6 +50,21 @@ if (dbErr) {
   process.exit(1);
 }
 
+// ── Pré-check : clé Groq ─────────────────────────────────────────
+if (OK.groq) {
+  try {
+    await groq.chat.completions.create({
+      model:'llama-3.1-8b-instant', max_tokens:5,
+      messages:[{ role:'user', content:'ok' }]
+    });
+  } catch(err) {
+    console.error('❌  Clé Groq invalide (erreur 401) :', err.message.slice(0, 60));
+    console.error('   → Va sur https://console.groq.com → API Keys → Create API Key');
+    console.error('   → Remplace GROQ_API_KEY dans pipeline/.env avec la nouvelle clé');
+    process.exit(1);
+  }
+}
+
 console.log('── Sources actives ──────────────────────────────────');
 console.log('  Reddit     ✓  (JSON public, sans clé)');
 console.log('  Hacker News✓  (Algolia, sans clé)');
