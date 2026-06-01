@@ -1,0 +1,5 @@
+pipeline/node_modules
+pipeline/.env
+.github
+*.toml
+*.md
