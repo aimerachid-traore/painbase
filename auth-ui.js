@@ -9,10 +9,12 @@
 (function () {
 
   // ── Injection du HTML de la modal ─────────────────────────────
-  const MODAL_HTML = `
+  const _t = k => (window.t || (x => x))(k);
+
+  function buildModalHtml() { return `
 <div class="pb-overlay" id="pbOverlay">
-  <div class="pb-modal" role="dialog" aria-modal="true" aria-label="Connexion PainBase">
-    <button class="pb-modal-close" id="pbClose" aria-label="Fermer">✕</button>
+  <div class="pb-modal" role="dialog" aria-modal="true" aria-label="PainBase">
+    <button class="pb-modal-close" id="pbClose" aria-label="Close">✕</button>
 
     <div class="pb-modal-logo">
       <span class="mark"></span>PainBase
@@ -20,51 +22,51 @@
 
     <!-- Tabs -->
     <div class="pb-tabs" role="tablist">
-      <button class="pb-tab active" id="tabSignin" role="tab" aria-selected="true">Sign in</button>
-      <button class="pb-tab"        id="tabSignup" role="tab" aria-selected="false">Create account</button>
+      <button class="pb-tab active" id="tabSignin" role="tab" aria-selected="true">${_t('auth.signin_tab')}</button>
+      <button class="pb-tab"        id="tabSignup" role="tab" aria-selected="false">${_t('auth.signup_tab')}</button>
     </div>
 
     <!-- SIGN IN -->
     <form id="formSignin" autocomplete="on">
       <div class="pb-field">
-        <label for="siEmail">Email</label>
+        <label for="siEmail">${_t('auth.email')}</label>
         <input id="siEmail" type="email" placeholder="you@example.com" required autocomplete="email">
       </div>
       <div class="pb-field">
-        <label for="siPassword">Password</label>
+        <label for="siPassword">${_t('auth.password')}</label>
         <input id="siPassword" type="password" placeholder="••••••••" required autocomplete="current-password">
       </div>
-      <div class="pb-forgot"><a id="forgotLink">Forgot password?</a></div>
-      <button class="pb-submit" type="submit" id="btnSignin">Sign in →</button>
+      <div class="pb-forgot"><a id="forgotLink">${_t('auth.forgot')}</a></div>
+      <button class="pb-submit" type="submit" id="btnSignin">${_t('auth.signin_btn')}</button>
     </form>
 
-    <!-- SIGN UP (caché par défaut) -->
+    <!-- SIGN UP -->
     <form id="formSignup" style="display:none" autocomplete="on">
       <div class="pb-field">
-        <label for="suEmail">Email</label>
+        <label for="suEmail">${_t('auth.email')}</label>
         <input id="suEmail" type="email" placeholder="you@example.com" required autocomplete="email">
       </div>
       <div class="pb-field">
-        <label for="suPassword">Password</label>
-        <input id="suPassword" type="password" placeholder="8+ characters" required minlength="8" autocomplete="new-password">
+        <label for="suPassword">${_t('auth.password')}</label>
+        <input id="suPassword" type="password" placeholder="${_t('auth.pass_placeholder')}" required minlength="8" autocomplete="new-password">
       </div>
-      <button class="pb-submit" type="submit" id="btnSignup">Create free account →</button>
+      <button class="pb-submit" type="submit" id="btnSignup">${_t('auth.signup_btn')}</button>
     </form>
 
     <!-- Google OAuth -->
-    <div class="pb-divider">or</div>
+    <div class="pb-divider">${_t('auth.or')}</div>
     <button class="pb-google" id="btnGoogle" type="button">
       <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z"/><path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332Z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58Z"/></svg>
-      Continue with Google
+      ${_t('auth.google')}
     </button>
 
     <!-- Message d'état -->
     <div class="pb-msg" id="pbMsg"></div>
   </div>
-</div>`;
+</div>`; }
 
   function setup() {
-    document.body.insertAdjacentHTML('beforeend', MODAL_HTML);
+    document.body.insertAdjacentHTML('beforeend', buildModalHtml());
     _init();
   }
   // Fonctionne que le DOM soit déjà chargé ou non
@@ -88,7 +90,7 @@
   function setLoading(btnId, loading) {
     const btn = $(btnId);
     btn.disabled = loading;
-    btn.textContent = loading ? 'Loading…' : btn.dataset.label;
+    btn.textContent = loading ? _t('auth.loading') : btn.dataset.label;
   }
 
   // ── Open / Close modal ─────────────────────────────────────────
@@ -122,8 +124,8 @@
   // ── Init events ────────────────────────────────────────────────
   function _init() {
     // store labels
-    $('btnSignin').dataset.label = 'Sign in →';
-    $('btnSignup').dataset.label = 'Create free account →';
+    $('btnSignin').dataset.label = _t('auth.signin_btn');
+    $('btnSignup').dataset.label = _t('auth.signup_btn');
 
     // close
     $('pbClose').addEventListener('click', () => PBAuthModal.close());
@@ -141,10 +143,10 @@
     // forgot password
     $('forgotLink').addEventListener('click', async () => {
       const email = $('siEmail').value.trim();
-      if (!email) { showMsg('Enter your email first.'); return; }
+      if (!email) { showMsg(_t('auth.enter_email')); return; }
       const { error } = await PBAuth.resetPassword(email);
       if (error) showMsg(error.message);
-      else showMsg('Check your inbox for a reset link.', 'success');
+      else showMsg(_t('auth.reset_sent'), 'success');
     });
 
     // ── SIGN IN ──────────────────────────────────────────────────
@@ -159,10 +161,10 @@
       setLoading('btnSignin', false);
       if (error) {
         showMsg(error.message === 'Invalid login credentials'
-          ? 'Wrong email or password.'
+          ? _t('auth.wrong_creds')
           : error.message);
       } else {
-        showMsg('Welcome back!', 'success');
+        showMsg(_t('auth.welcome'), 'success');
         setTimeout(() => PBAuthModal.close(), 800);
       }
     });
@@ -180,7 +182,7 @@
       if (error) {
         showMsg(error.message);
       } else {
-        showMsg('Account created! Check your email to confirm.', 'success');
+        showMsg(_t('auth.account_created'), 'success');
       }
     });
 
@@ -221,10 +223,10 @@
           <span>${email.split('@')[0]}</span>
           <span class="arrow">▾</span>
           <div class="pb-user-menu" id="pbMenu">
-            <a href="painbase-dashboard.html">My saved problems</a>
-            <a href="painbase-dashboard.html">Dashboard</a>
+            <a href="painbase-dashboard.html">${_t('nav.saved')}</a>
+            <a href="painbase-dashboard.html">${_t('nav.dashboard')}</a>
             <div class="divider"></div>
-            <a class="signout" id="pbSignOut">Sign out</a>
+            <a class="signout" id="pbSignOut">${_t('nav.signout')}</a>
           </div>
         </div>`;
 
@@ -265,8 +267,8 @@
 
     } else {
       cta.innerHTML = `
-        <a href="#" class="pb-signin-trigger" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">Sign in</a>
-        <button class="btn btn-primary pb-signup-trigger">Start hunting</button>`;
+        <a href="#" class="pb-signin-trigger" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">${_t('nav.signin')}</a>
+        <button class="btn btn-primary pb-signup-trigger">${_t('nav.start')}</button>`;
       cta.querySelector('.pb-signin-trigger')?.addEventListener('click', e => {
         e.preventDefault(); PBAuthModal.open('signin');
       });
