@@ -241,8 +241,8 @@
     <p class=”sub rv” style=”animation-delay:.2s”>PainBase mines Reddit, Hacker News &amp; forums for the things people <b>actually complain about</b> — then clusters them into validated, fundable problems. Stop guessing what to build.</p>
 
     <div class=”searchbar rv” style=”animation-delay:.28s”>
-      <svg width=”20” height=”20” viewBox=”0 0 24 24” fill=”none” stroke=”currentColor” stroke-width=”2”><circle cx=”11” cy=”11” r=”7”/><path d=”m21 21-4.3-4.3”/></svg>
-      <input id=”search” type=”text” placeholder='Search a problem, e.g. “invoices”, “sleep”, “onboarding”…' autocomplete=”off”>
+      <svg width=”20” height=”20” viewBox=”0 0 24 24” fill=”none” stroke=”currentColor” stroke-width=”2”><circle cx=”11” cy=”11” r=”7”></circle><path d=”m21 21-4.3-4.3”></path></svg>
+      <input id=”search” type=”text” placeholder=”Search a problem, e.g. invoices, sleep, onboarding...” autocomplete=”off”>
       <button class=”btn btn-primary” style=”flex:none”>Search</button>
     </div>
 
@@ -468,14 +468,14 @@
     });
   }
 
-  chips.addEventListener('click', e => {
+  if(chips) chips.addEventListener('click', e => {
     if(!e.target.classList.contains('chip')) return;
     chips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     e.target.classList.add('active');
     activeTheme = e.target.dataset.theme;
     render();
   });
-  search.addEventListener('input', render);
+  if(search) search.addEventListener('input', render);
 
   // Spinner initial
   grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Loading problems…</div>`;
