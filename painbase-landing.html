@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -350,9 +350,6 @@
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
-  // Garde : si i18n.js n'est pas chargé (cache Cloudflare, réseau), t() retourne la clé
-  if (typeof window.t !== 'function') window.t = k => k;
-
   const grid = document.getElementById('grid');
   const board = document.getElementById('board');
   const chips = document.getElementById('themes');
@@ -360,19 +357,17 @@
   const resultCount = document.getElementById('resultCount');
   let activeTheme = 'all';
   let _problems = [];
+  let _searchTimer = null;
+  let _stepTimer = null;
 
   const fmt = n => n.toLocaleString('en-US');
 
-  // Normalise un problème Supabase ou statique vers la même forme
   function normalize(p){
-    return p.title ? {  // vient de Supabase
+    return p.title ? {
       id:p.id, t:p.title, theme:p.theme, mentions:p.mentions,
-      trend:p.trend_pct, src:[], hot:p.is_hot, ai:p.ai_brief||''
-    } : p; // déjà au format statique
+      trend:p.trend_pct||0, src:[], hot:p.is_hot, ai:p.ai_brief||''
+    } : p;
   }
-
-  let _searchTimer = null;
-  let _stepTimer   = null;
 
   function render(){
     const q = search.value.trim().toLowerCase();
@@ -381,7 +376,7 @@
       const okQ = !q || p.t.toLowerCase().includes(q) || p.theme.toLowerCase().includes(q) || p.ai.toLowerCase().includes(q);
       return okTheme && okQ;
     });
-    resultCount.textContent = list.length + ' ' + (list.length===1?t('search.problem'):t('search.problems'));
+    resultCount.textContent = list.length + (list.length===1?' problem':' problems');
 
     if(list.length){
       grid.innerHTML = list.map(p=>`
@@ -395,17 +390,16 @@
           <p class="ai"><span class="badge">AI</span>${p.ai}</p>
           <div class="card-foot">
             <span class="mentions">${fmt(p.mentions)} <span>mentions</span></span>
-            ${p.src&&p.src.length?`<span class="srcs">${p.src.map(s=>`<span class="src">${s}</span>`).join('')}</span>`:''}
           </div>
         </a>`).join('');
     } else if(q.length >= 3) {
-      // Pas de résultat → scraping IA à la demande
       clearTimeout(_searchTimer);
-      const steps = [t('search.step1'),t('search.step2'),t('search.step3'),t('search.step4')];
+      clearInterval(_stepTimer);
+      const steps = ['Scraping Reddit…','Scraping Hacker News…','AI analysis…','Generating ideas…'];
       let stepIdx = 0;
       grid.innerHTML = `<div id="aiSearchBox" style="grid-column:1/-1;padding:40px 28px;border:1px solid var(--ember-soft);border-radius:18px;background:var(--panel)">
-        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:10px">${t('search.ai_label')}</div>
-        <div style="font-size:15px;color:var(--ink);margin-bottom:20px">${t('search.no_base_prefix')} "<strong>${q}</strong>" ${t('search.no_base_suffix')}</div>
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:10px">🔍 Live AI Search</div>
+        <div style="font-size:15px;color:var(--ink);margin-bottom:20px">No results in database for "<strong>${q}</strong>" — scraping Reddit & HN now…</div>
         <div id="aiSearchStep" style="font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint);margin-bottom:16px">⟳ ${steps[0]}</div>
         <div id="aiSearchResult"></div>
       </div>`;
@@ -416,46 +410,40 @@
       }, 2000);
       _searchTimer = setTimeout(() => liveSearch(q), 800);
     } else if(q.length > 0) {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">${t('search.min_chars')}</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Type at least 3 characters to search.</div>`;
     } else {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">${t('search.no_problems')}</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Loading problems…</div>`;
     }
   }
 
-  // ── Recherche IA à la demande ─────────────────────────────────
   async function liveSearch(q) {
     const box = document.getElementById('aiSearchResult');
     if(!box) return;
     try {
-      const res  = await fetch(`/search?q=${encodeURIComponent(q)}`);
+      const res = await fetch(`/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
       clearInterval(_stepTimer); _stepTimer = null;
-      const stepEl2 = document.getElementById('aiSearchStep');
-      if(stepEl2) stepEl2.textContent = `✓ ${data.posts_found || 0} ${t('search.posts_analyzed')}`;
-
+      const stepEl = document.getElementById('aiSearchStep');
+      if(stepEl) stepEl.textContent = `✓ ${data.posts_found || 0} posts analysed`;
       if(!data.ideas || !data.ideas.length){
-        box.innerHTML = `<span style="color:var(--ink-faint)">${t('search.no_opportunity')}</span>`;
+        box.innerHTML = `<span style="color:var(--ink-faint)">No SaaS opportunity detected for this keyword. Try a more specific term.</span>`;
         return;
       }
-
       box.innerHTML = `
-        <div style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;font-family:'JetBrains Mono'">${data.posts_found} ${t('search.posts_analyzed')}</div>
+        <div style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;font-family:'JetBrains Mono'">${data.posts_found} posts collected from Reddit & HN</div>
         <div style="display:grid;gap:12px">
           ${data.ideas.map(idea=>`
             <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:18px 20px">
               <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:8px">${idea.title}</div>
               <div style="font-size:13.5px;color:var(--ink-dim);margin-bottom:8px">${idea.problem}</div>
               <div style="font-size:13px;color:var(--ember)">${idea.opportunity}</div>
-              ${idea.confidence?`<div style="margin-top:10px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)">${t('search.confidence')} ${idea.confidence}/100</div>`:''}
+              ${idea.confidence?`<div style="margin-top:10px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)">AI confidence: ${idea.confidence}/100</div>`:''}
             </div>`).join('')}
         </div>
-        ${data.sources&&data.sources.length?`
-        <div style="margin-top:16px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)">
-          ${t('search.sources')} ${data.sources.map(s=>`<a href="${s.url}" target="_blank" style="color:var(--ink-faint);text-decoration:underline">${s.platform.toUpperCase()}</a>`).join(' · ')}
-        </div>`:''}`;
+        ${data.sources&&data.sources.length?`<div style="margin-top:16px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)">Sources: ${data.sources.map(s=>`<a href="${s.url}" target="_blank" style="color:var(--ink-faint);text-decoration:underline">${s.platform.toUpperCase()}</a>`).join(' · ')}</div>`:''}`;
     } catch(e) {
       clearInterval(_stepTimer); _stepTimer = null;
-      if(box) box.innerHTML = `<span style="color:var(--ink-faint)">${t('search.error')}</span>`;
+      if(box) box.innerHTML = `<span style="color:var(--ink-faint)">Search error. Please retry.</span>`;
     }
   }
 
@@ -480,35 +468,48 @@
     });
   }
 
-  chips.addEventListener('click',e=>{
-    if(!e.target.classList.contains('chip'))return;
-    chips.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chips.addEventListener('click', e => {
+    if(!e.target.classList.contains('chip')) return;
+    chips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     e.target.classList.add('active');
-    activeTheme=e.target.dataset.theme;
+    activeTheme = e.target.dataset.theme;
     render();
   });
-  search.addEventListener('input',render);
+  search.addEventListener('input', render);
 
-  // Affiche un spinner pendant le chargement
-  grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">${t('search.loading')}</div>`;
+  // Spinner initial
+  grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Loading problems…</div>`;
+
+  // Met à jour les chips de thèmes depuis les données réelles
+  function updateThemeChips(problems) {
+    const themeCounts = {};
+    problems.forEach(p => {
+      const theme = p.theme || p.t;
+      if(theme) themeCounts[theme] = (themeCounts[theme]||0)+1;
+    });
+    const sorted = Object.entries(themeCounts).sort((a,b)=>b[1]-a[1]);
+    // Garde le bouton "All themes" + ajoute les thèmes réels
+    chips.innerHTML = `<button class="chip ${activeTheme==='all'?'active':''}" data-theme="all">All themes</button>` +
+      sorted.map(([theme]) =>
+        `<button class="chip ${activeTheme===theme?'active':''}" data-theme="${theme}">${theme}</button>`
+      ).join('');
+  }
 
   // Charge depuis Supabase
   async function loadData(){
     const {data, error} = await PBData.getProblems();
     if(!error && data && data.length){
       _problems = data;
+      updateThemeChips(data);
       render();
       renderBoard();
-      // Met à jour le compteur avec le vrai nombre
       document.getElementById('ct1').textContent = fmt(data.length);
     } else {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">${t('search.no_problems_yet').replace('\n','<br>')}</div>`;
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No problems available yet.<br>The pipeline is collecting data — check back in a few minutes.</div>`;
+      console.error('Supabase error:', error);
     }
   }
   loadData();
-
-  // Compteurs statiques (sources actives)
-  document.getElementById('ct2').textContent = '5';  // Reddit, HN, Dev.to, Facebook, Twitter
 </script>
 </body>
 </html>
