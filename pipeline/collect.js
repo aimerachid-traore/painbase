@@ -14,8 +14,45 @@ import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
 import fetch from 'node-fetch';
 
+// ── Vérification des credentials disponibles ──────────────────
+const HAS_REDDIT = !!(
+  process.env.REDDIT_CLIENT_ID &&
+  process.env.REDDIT_CLIENT_SECRET &&
+  process.env.REDDIT_USERNAME &&
+  process.env.REDDIT_PASSWORD &&
+  !process.env.REDDIT_CLIENT_ID.includes('your_')
+);
+
+const HAS_AI = !!(
+  process.env.ANTHROPIC_API_KEY &&
+  !process.env.ANTHROPIC_API_KEY.includes('sk-ant-...')
+);
+
+const HAS_SUPABASE = !!(
+  process.env.SUPABASE_URL &&
+  process.env.SUPABASE_SERVICE_KEY &&
+  !process.env.SUPABASE_URL.includes('xxxx')
+);
+
+if (!HAS_SUPABASE) {
+  console.error('❌  SUPABASE_URL ou SUPABASE_SERVICE_KEY manquant — vérifier les secrets GitHub.');
+  process.exit(1);
+}
+
+if (!HAS_REDDIT) {
+  console.log('⏳  Credentials Reddit non configurés — pipeline en attente d\'approbation API.');
+  console.log('    Ajouter dans GitHub → Settings → Secrets :');
+  console.log('    REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USERNAME, REDDIT_PASSWORD');
+  process.exit(0); // exit 0 = succès, pas une erreur
+}
+
+if (!HAS_AI) {
+  console.log('⏳  ANTHROPIC_API_KEY non configurée — classification IA désactivée.');
+  console.log('    Le pipeline HN peut tourner sans IA mais les résultats seront non filtrés.');
+}
+
 const sb  = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-const ai  = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const ai  = HAS_AI ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
 
 const reddit = new Snoowrap({
   userAgent: 'painbase-collector/1.0',
@@ -103,6 +140,7 @@ Respond with ONLY valid JSON (no markdown):
 is_problem = true ONLY if: the post clearly describes frustration with an unsolved problem, not just a question or general discussion.`;
 
 async function classifyPost(post) {
+  if (!ai) return { is_problem: false }; // pas de clé IA → skip
   try {
     const prompt = CLASSIFY_PROMPT
       .replace('{TITLE}',   post.title)
@@ -110,7 +148,7 @@ async function classifyPost(post) {
       .replace('{SOURCE}',  post.subreddit);
 
     const msg = await ai.messages.create({
-      model: 'claude-haiku-4-5',  // rapide + bon marché pour la classification
+      model: 'claude-haiku-4-5',
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }]
     });

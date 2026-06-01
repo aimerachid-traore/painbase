@@ -2,20 +2,23 @@ name: PainBase Data Pipeline
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # toutes les 6h (gratuit sur GitHub Actions)
-  workflow_dispatch:          # lancement manuel depuis l'onglet Actions
+    - cron: '0 */6 * * *'   # toutes les 6h
+  workflow_dispatch:          # lancement manuel
 
 jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    # Ne tourne que si les secrets Supabase sont configurés
+    if: ${{ secrets.SUPABASE_URL != '' && secrets.SUPABASE_SERVICE_KEY != '' }}
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'        # LTS — Node 20 déprécié sur GitHub Actions
           cache: 'npm'
           cache-dependency-path: pipeline/package.json
 
@@ -35,5 +38,11 @@ jobs:
           REDDIT_PASSWORD:        ${{ secrets.REDDIT_PASSWORD }}
           ANTHROPIC_API_KEY:      ${{ secrets.ANTHROPIC_API_KEY }}
 
-# ── Pour configurer les secrets GitHub :
-#    Repo → Settings → Secrets and variables → Actions → New repository secret
+# ── Secrets à ajouter dans GitHub → Settings → Secrets and variables → Actions :
+#    SUPABASE_URL           → URL de ton projet Supabase
+#    SUPABASE_SERVICE_KEY   → service_role key (Settings → API)
+#    REDDIT_CLIENT_ID       → après approbation API Reddit
+#    REDDIT_CLIENT_SECRET   → après approbation API Reddit
+#    REDDIT_USERNAME        → ton compte Reddit
+#    REDDIT_PASSWORD        → mot de passe Reddit
+#    ANTHROPIC_API_KEY      → clé Claude (console.anthropic.com)
