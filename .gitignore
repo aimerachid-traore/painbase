@@ -2,5 +2,6 @@ node_modules/
 pipeline/.env
 pipeline/.env.local
 .claude/
+analytics.local.html
 
 # supabase.config.js contient uniquement la clé PUBLIQUE (anon) — safe à committer

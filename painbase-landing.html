@@ -397,13 +397,19 @@
     } else if(q.length >= 3) {
       // Pas de résultat → scraping IA à la demande
       clearTimeout(_searchTimer);
-      grid.innerHTML = `<div id="aiSearchBox" style="grid-column:1/-1;padding:40px 28px;border:1px solid var(--line);border-radius:18px;background:var(--panel)">
-        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:8px">Recherche IA en temps réel</div>
-        <div style="font-size:15px;color:var(--ink);margin-bottom:20px">Aucun résultat en base pour "<strong>${q}</strong>" — je scrape Reddit & HN maintenant…</div>
-        <div id="aiSearchResult" style="color:var(--ink-dim);font-size:13px">
-          <span style="font-family:'JetBrains Mono'">⟳ Analyse en cours…</span>
-        </div>
+      const steps = ['Scraping Reddit…','Scraping Hacker News…','Analyse IA en cours…','Génération des idées…'];
+      let stepIdx = 0;
+      grid.innerHTML = `<div id="aiSearchBox" style="grid-column:1/-1;padding:40px 28px;border:1px solid var(--ember-soft);border-radius:18px;background:var(--panel)">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:10px">🔍 Recherche IA en temps réel</div>
+        <div style="font-size:15px;color:var(--ink);margin-bottom:20px">Aucun résultat en base pour "<strong>${q}</strong>" — scraping Reddit & HN en cours…</div>
+        <div id="aiSearchStep" style="font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint);margin-bottom:16px">⟳ ${steps[0]}</div>
+        <div id="aiSearchResult"></div>
       </div>`;
+      const stepEl = document.getElementById('aiSearchStep');
+      const stepTimer = setInterval(() => {
+        stepIdx = Math.min(stepIdx+1, steps.length-1);
+        if(stepEl) stepEl.textContent = '⟳ ' + steps[stepIdx];
+      }, 2000);
       _searchTimer = setTimeout(() => liveSearch(q), 800);
     } else if(q.length > 0) {
       grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Tape au moins 3 caractères pour lancer une recherche.</div>`;
@@ -419,6 +425,9 @@
     try {
       const res  = await fetch(`/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
+      clearInterval(stepTimer);
+      const stepEl2 = document.getElementById('aiSearchStep');
+      if(stepEl2) stepEl2.textContent = `✓ ${data.posts_found || 0} posts analysés`;
 
       if(!data.ideas || !data.ideas.length){
         box.innerHTML = `<span style="color:var(--ink-faint)">Aucune opportunité détectée pour ce mot-clé. Essaie un terme plus spécifique.</span>`;
@@ -441,6 +450,7 @@
           Sources : ${data.sources.map(s=>`<a href="${s.url}" target="_blank" style="color:var(--ink-faint);text-decoration:underline">${s.platform.toUpperCase()}</a>`).join(' · ')}
         </div>`:''}`;
     } catch(e) {
+      clearInterval(stepTimer);
       if(box) box.innerHTML = `<span style="color:var(--ink-faint)">Erreur lors de la recherche. Réessaie dans un instant.</span>`;
     }
   }
