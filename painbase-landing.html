@@ -370,7 +370,7 @@
   }
 
   function render(){
-    const q = search.value.trim().toLowerCase();
+    const q = search ? search.value.trim().toLowerCase() : '';
     const list = _problems.map(normalize).filter(p=>{
       const okTheme = activeTheme==='all' || p.theme===activeTheme;
       const okQ = !q || p.t.toLowerCase().includes(q) || p.theme.toLowerCase().includes(q) || p.ai.toLowerCase().includes(q);
@@ -489,6 +489,7 @@
     });
     const sorted = Object.entries(themeCounts).sort((a,b)=>b[1]-a[1]);
     // Garde le bouton "All themes" + ajoute les thèmes réels
+    if(!chips) return;
     chips.innerHTML = `<button class="chip ${activeTheme==='all'?'active':''}" data-theme="all">All themes</button>` +
       sorted.map(([theme]) =>
         `<button class="chip ${activeTheme===theme?'active':''}" data-theme="${theme}">${theme}</button>`
