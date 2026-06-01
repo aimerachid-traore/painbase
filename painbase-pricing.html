@@ -332,32 +332,68 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
-// ── Gestion des boutons de plan ──────────────────────────────────
+// ── Notification toast ───────────────────────────────────────────
+function toast(html, color='var(--ember)') {
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;top:24px;left:50%;transform:translateX(-50%);
+    background:#1B1712;border:1px solid ${color};color:#F3ECDF;padding:14px 22px;
+    border-radius:12px;z-index:9999;font-family:Archivo,sans-serif;font-size:14.5px;
+    text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:opacity .3s;max-width:90vw`;
+  el.innerHTML = html;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 4000);
+}
+
+// ── Boutons de plan → Stripe Checkout ────────────────────────────
 async function handlePlanClick(plan) {
-  // Vérifie si déjà connecté (lecture localStorage, instantané)
-  const user = typeof PBAuth !== 'undefined'
-    ? await PBAuth.getSession()
-    : null;
+  const user = typeof PBAuth !== 'undefined' ? await PBAuth.getSession() : null;
 
   if (!user) {
-    // Pas connecté → inscription
     if (typeof PBAuthModal !== 'undefined') PBAuthModal.open('signup');
     return;
   }
 
-  // Connecté → action selon le plan
   if (plan === 'free') {
     window.location.href = 'painbase-dashboard.html';
     return;
   }
 
-  // Plans payants → Stripe (à intégrer plus tard)
-  // Pour l'instant, message informatif
-  const msg = document.createElement('div');
-  msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1B1712;border:1px solid #FF5C38;color:#F3ECDF;padding:16px 24px;border-radius:12px;z-index:999;font-family:Archivo,sans-serif;font-size:15px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)';
-  msg.innerHTML = `✓ Connecté en tant que <strong>${user.email}</strong><br><span style="color:#A89C89;font-size:13px">Paiement Stripe bientôt disponible — on te contacte.</span>`;
-  document.body.appendChild(msg);
-  setTimeout(() => msg.remove(), 4000);
+  // Appel à la Netlify Function pour créer la session Stripe
+  const btn = event.target.closest('button');
+  const origText = btn.textContent;
+  btn.textContent = 'Loading…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch('/.netlify/functions/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plan,
+        email:   user.email,
+        billing: annual ? 'annual' : 'monthly'
+      })
+    });
+
+    const { url, error } = await res.json();
+
+    if (error) { toast(`❌ ${error}`); return; }
+
+    // Stripe checkout → redirige vers la page de paiement Stripe
+    window.location.href = url;
+
+  } catch(err) {
+    toast('❌ Erreur réseau — réessaie dans un instant.');
+  } finally {
+    btn.textContent = origText;
+    btn.disabled = false;
+  }
+}
+
+// Gère le retour après paiement réussi
+if (new URLSearchParams(location.search).get('waitlist') === 'true') {
+  const plan = new URLSearchParams(location.search).get('plan') || 'pro';
+  toast(`✅ Inscrit sur la liste d'attente pour le plan <strong>${plan}</strong> — on te contacte dès l'ouverture !`, 'var(--green)');
 }
 
 // ── Billing toggle ───────────────────────────────────────────────

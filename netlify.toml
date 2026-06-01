@@ -2,6 +2,6 @@
   command = "node build.js"
   publish = "."
 
-# Les variables SUPABASE_URL et SUPABASE_ANON_KEY sont à configurer dans :
-# Netlify → Site settings → Environment variables
-# Elles ne doivent JAMAIS être dans le code ou dans git.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
