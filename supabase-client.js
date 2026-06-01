@@ -15,10 +15,19 @@ const PBAuth = {
   resetPassword: email => _sb.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin + '/painbase-landing.html'
   }),
+
+  // Lecture rapide depuis localStorage (pas d'appel réseau)
+  getSession: async () => {
+    const { data: { session } } = await _sb.auth.getSession();
+    return session?.user ?? null;
+  },
+
+  // Vérification serveur (plus sûr mais plus lent)
   getUser: async () => {
     const { data: { user } } = await _sb.auth.getUser();
     return user;
   },
+
   onAuthChange: cb => _sb.auth.onAuthStateChange((_event, session) => cb(session?.user ?? null))
 };
 

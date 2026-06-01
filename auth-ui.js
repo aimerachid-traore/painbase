@@ -195,10 +195,12 @@
 
     // ── Écoute les changements de session ──────────────────────
     if (typeof PBAuth !== 'undefined') {
+      // getSession = lecture localStorage, immédiat → nav se met à jour sans délai
+      PBAuth.getSession().then(user => _updateNavAuth(user));
+      // onAuthChange couvre login/logout en temps réel
       PBAuth.onAuthChange(user => _updateNavAuth(user));
-      PBAuth.getUser().then(user => _updateNavAuth(user));
     } else {
-      _updateNavAuth(null); // pas connecté — affiche Sign in / Start hunting
+      _updateNavAuth(null);
     }
   }
 

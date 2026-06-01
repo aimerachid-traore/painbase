@@ -433,15 +433,47 @@ function renderPage(p){
   countUp(document.getElementById('ct-mentions'), p.mentions);
   countUp(document.getElementById('ct-posts'), d.sourcePosts);
 
-  // save button
-  let saved=false;
-  const saveBtn=document.getElementById('saveBtn');
-  saveBtn.addEventListener('click',()=>{
-    saved=!saved;
-    saveBtn.classList.toggle('saved',saved);
-    saveBtn.innerHTML=saved
-      ?`<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Saved`
-      :`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> Save problem`;
+  // ── Save button ─────────────────────────────────────────────
+  const problemId = p.id;
+  let saved = false;
+  const saveBtn = document.getElementById('saveBtn');
+
+  const SVG_EMPTY  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+  const SVG_FILLED = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+
+  function setSaved(state) {
+    saved = state;
+    saveBtn.classList.toggle('saved', state);
+    saveBtn.innerHTML = state ? `${SVG_FILLED} Saved` : `${SVG_EMPTY} Save problem`;
+  }
+
+  // Vérifie si déjà sauvegardé au chargement
+  if (window.PB_CONFIGURED) {
+    PBAuth.getSession().then(async user => {
+      if (!user) return;
+      const ids = await PBData.getSavedIds();
+      if (ids.includes(problemId)) setSaved(true);
+    });
+  }
+
+  saveBtn.addEventListener('click', async () => {
+    // Vérifie si connecté
+    const user = await (window.PB_CONFIGURED ? PBAuth.getSession() : Promise.resolve(null));
+    if (!user) {
+      PBAuthModal.open('signin');
+      return;
+    }
+    const newState = !saved;
+    setSaved(newState); // optimistic UI
+    if (window.PB_CONFIGURED) {
+      const result = newState
+        ? await PBData.saveProblem(problemId)
+        : await PBData.unsaveProblem(problemId);
+      if (result?.error && result.error !== 'not_authenticated') {
+        setSaved(!newState); // rollback si erreur
+        console.error('Save error:', result.error);
+      }
+    }
   });
 
   // AI summary

@@ -188,7 +188,7 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
         <div class="plan-name">Free</div>
         <div class="plan-price"><span class="amount">$0</span><span class="period">/mo</span></div>
         <div class="plan-desc">Browse and explore. Perfect for validating your first idea.</div>
-        <button class="plan-btn ghost pb-signup-trigger" onclick="PBAuthModal.open('signup')">Get started free</button>
+        <button class="plan-btn ghost" onclick="handlePlanClick('free')">Get started free</button>
         <div class="features">
           <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Access to top 20 problems</div>
           <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI brief for each problem</div>
@@ -211,7 +211,7 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
           <span class="old" id="proOld" style="display:none">$29</span>
         </div>
         <div class="plan-desc">Everything you need to find, validate, and build your next product.</div>
-        <button class="plan-btn primary" onclick="PBAuthModal.open('signup')">Start 7-day free trial</button>
+        <button class="plan-btn primary" onclick="handlePlanClick('pro')">Start 7-day free trial</button>
         <div class="features">
           <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>All 48,000+ problems</div>
           <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Full AI analysis & product angles</div>
@@ -233,7 +233,7 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
           <span class="old" id="builderOld" style="display:none">$79</span>
         </div>
         <div class="plan-desc">For teams and agencies doing systematic opportunity research at scale.</div>
-        <button class="plan-btn ghost" onclick="PBAuthModal.open('signup')">Start 7-day free trial</button>
+        <button class="plan-btn ghost" onclick="handlePlanClick('builder')">Start 7-day free trial</button>
         <div class="features">
           <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</div>
           <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>REST API access</div>
@@ -332,6 +332,34 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
+// ── Gestion des boutons de plan ──────────────────────────────────
+async function handlePlanClick(plan) {
+  // Vérifie si déjà connecté (lecture localStorage, instantané)
+  const user = typeof PBAuth !== 'undefined'
+    ? await PBAuth.getSession()
+    : null;
+
+  if (!user) {
+    // Pas connecté → inscription
+    if (typeof PBAuthModal !== 'undefined') PBAuthModal.open('signup');
+    return;
+  }
+
+  // Connecté → action selon le plan
+  if (plan === 'free') {
+    window.location.href = 'painbase-dashboard.html';
+    return;
+  }
+
+  // Plans payants → Stripe (à intégrer plus tard)
+  // Pour l'instant, message informatif
+  const msg = document.createElement('div');
+  msg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1B1712;border:1px solid #FF5C38;color:#F3ECDF;padding:16px 24px;border-radius:12px;z-index:999;font-family:Archivo,sans-serif;font-size:15px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5)';
+  msg.innerHTML = `✓ Connecté en tant que <strong>${user.email}</strong><br><span style="color:#A89C89;font-size:13px">Paiement Stripe bientôt disponible — on te contacte.</span>`;
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 4000);
+}
+
 // ── Billing toggle ───────────────────────────────────────────────
 const toggle = document.getElementById('billingToggle');
 const badge  = document.getElementById('annualBadge');
