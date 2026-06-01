@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="i18n.js"></script>
 <link rel="stylesheet" href="auth-ui.css">
 <link rel="stylesheet" href="mobile-nav.css">
 <style>
@@ -222,11 +221,11 @@
   <div class="wrap nav-in">
     <a href="painbase-landing.html" class="logo"><span class="mark"></span>PainBase</a>
     <div class="nav-links">
-      <a href="#explore" data-i18n="nav.browse">Browse problems</a>
-      <a href="#leaderboard" data-i18n="nav.leaderboard">Leaderboard</a>
-      <a href="#how" data-i18n="nav.how">How it works</a>
-      <a href="painbase-pricing.html" data-i18n="nav.pricing">Pricing</a>
-      <a href="painbase-dashboard.html" data-i18n="nav.dashboard">Dashboard</a>
+      <a href="#explore">Browse problems</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#how">How it works</a>
+      <a href="painbase-pricing.html">Pricing</a>
+      <a href="painbase-dashboard.html">Dashboard</a>
     </div>
     <div class="nav-cta">
       <a href="#" class="pb-signin-trigger" style="color:var(--ink-dim);font-size:14.5px;font-weight:500">Sign in</a>
@@ -237,20 +236,20 @@
 
 <header>
   <div class="wrap">
-    <span class=”live rv” style=”animation-delay:.05s”><span class=”dot”></span><span data-i18n=”hero.live”>Listening to the internet · updated hourly</span></span>
-    <h1 class=”rv” style=”animation-delay:.12s” data-i18n-html=”hero.h1”>The database of <em>real problems</em> worth solving.</h1>
-    <p class=”sub rv” style=”animation-delay:.2s” data-i18n-html=”hero.sub”>PainBase mines Reddit, Hacker News &amp; forums for the things people <b>actually complain about</b> — then clusters them into validated, fundable problems. Stop guessing what to build.</p>
+    <span class=”live rv” style=”animation-delay:.05s”><span class=”dot”></span>Listening to the internet · updated hourly</span>
+    <h1 class=”rv” style=”animation-delay:.12s”>The database of <em>real problems</em> worth solving.</h1>
+    <p class=”sub rv” style=”animation-delay:.2s”>PainBase mines Reddit, Hacker News &amp; forums for the things people <b>actually complain about</b> — then clusters them into validated, fundable problems. Stop guessing what to build.</p>
 
     <div class=”searchbar rv” style=”animation-delay:.28s”>
       <svg width=”20” height=”20” viewBox=”0 0 24 24” fill=”none” stroke=”currentColor” stroke-width=”2”><circle cx=”11” cy=”11” r=”7”/><path d=”m21 21-4.3-4.3”/></svg>
-      <input id=”search” type=”text” placeholder=”Search a problem, e.g. “invoices”, “sleep”, “onboarding”…” data-i18n-ph=”hero.placeholder” autocomplete=”off”>
-      <button class=”btn btn-primary” style=”flex:none” data-i18n=”hero.search_btn”>Search</button>
+      <input id=”search” type=”text” placeholder='Search a problem, e.g. “invoices”, “sleep”, “onboarding”…' autocomplete=”off”>
+      <button class=”btn btn-primary” style=”flex:none”>Search</button>
     </div>
 
     <div class=”stats rv” style=”animation-delay:.36s”>
-      <div class=”stat”><div class=”num” id=”ct1” data-to=”48213”>0</div><div class=”lbl” data-i18n=”hero.stat1”>problems tracked</div></div>
-      <div class=”stat”><div class=”num” id=”ct2” data-to=”6”>0</div><div class=”lbl” data-i18n=”hero.stat2”>sources mined</div></div>
-      <div class=”stat”><div class=”num” id=”ct3” data-to=”312000”>0</div><div class=”lbl” data-i18n=”hero.stat3”>posts analysed</div></div>
+      <div class=”stat”><div class=”num” id=”ct1”>0</div><div class=”lbl”>problems tracked</div></div>
+      <div class=”stat”><div class=”num” id=”ct2”>5</div><div class=”lbl”>sources mined</div></div>
+      <div class=”stat”><div class=”num” id=”ct3”>0</div><div class=”lbl”>posts analysed</div></div>
     </div>
   </div>
 </header>
@@ -258,7 +257,7 @@
 <section id="explore">
   <div class="wrap">
     <div class="themes" id="themes">
-      <button class="chip active" data-theme="all" data-i18n="themes.all">All themes</button>
+      <button class="chip active" data-theme="all">All themes</button>
       <button class="chip" data-theme="Productivity">Productivity</button>
       <button class="chip" data-theme="Health & Fitness">Health &amp; Fitness</button>
       <button class="chip" data-theme="Personal Finance">Personal Finance</button>
@@ -270,7 +269,7 @@
     </div>
 
     <div class="shead">
-      <h2 data-i18n="section.trending">Trending pain points</h2>
+      <h2>Trending pain points</h2>
       <span class="meta" id="resultCount">—</span>
     </div>
 
@@ -281,12 +280,12 @@
 <section id="leaderboard">
   <div class="wrap">
     <div class="shead">
-      <h2 data-i18n="section.leaderboard">Most complained-about · this week</h2>
-      <span class="meta" data-i18n="section.lb_meta">ranked by verified mentions</span>
+      <h2>Most complained-about · this week</h2>
+      <span class="meta">ranked by verified mentions</span>
     </div>
     <div class="board" id="board">
       <div class="row head">
-        <div>#</div><div data-i18n="lb.problem">Problem</div><div class="p-mentions-col" data-i18n="lb.mentions">Mentions</div><div data-i18n="lb.growth">Growth</div><div class="col-bar" data-i18n="lb.volume">Volume</div>
+        <div>#</div><div>Problem</div><div class="p-mentions-col">Mentions</div><div>Growth</div><div class="col-bar">Volume</div>
       </div>
     </div>
   </div>
@@ -294,22 +293,22 @@
 
 <section id="how">
   <div class="wrap">
-    <div class="shead"><h2 data-i18n="section.how">How PainBase works</h2><span class="meta" data-i18n="section.how_meta">listen → cluster → surface</span></div>
+    <div class="shead"><h2>How PainBase works</h2><span class="meta">listen → cluster → surface</span></div>
     <div class="how">
       <div class="step">
-        <div class="n" data-i18n="steps.s1_n">01 / LISTEN</div>
-        <h4 data-i18n="steps.s1_h">We never stop scraping</h4>
-        <p data-i18n="steps.s1_p">Workers continuously pull posts & comments from Reddit, Hacker News and forums where people vent about unsolved problems.</p>
+        <div class="n">01 / LISTEN</div>
+        <h4>We never stop scraping</h4>
+        <p>Workers continuously pull posts & comments from Reddit, Hacker News and forums where people vent about unsolved problems.</p>
       </div>
       <div class="step">
-        <div class="n" data-i18n="steps.s2_n">02 / CLUSTER</div>
-        <h4 data-i18n="steps.s2_h">AI groups the noise</h4>
-        <p data-i18n="steps.s2_p">Every post is classified, de-duplicated and clustered by embeddings, so 230 separate rants become one quantified problem.</p>
+        <div class="n">02 / CLUSTER</div>
+        <h4>AI groups the noise</h4>
+        <p>Every post is classified, de-duplicated and clustered by embeddings, so 230 separate rants become one quantified problem.</p>
       </div>
       <div class="step">
-        <div class="n" data-i18n="steps.s3_n">03 / SURFACE</div>
-        <h4 data-i18n="steps.s3_h">You get the brief</h4>
-        <p data-i18n="steps.s3_p">For each problem, the AI writes a summary, scores demand & competition, and suggests a product angle you could actually ship.</p>
+        <div class="n">03 / SURFACE</div>
+        <h4>You get the brief</h4>
+        <p>For each problem, the AI writes a summary, scores demand & competition, and suggests a product angle you could actually ship.</p>
       </div>
     </div>
   </div>
@@ -318,9 +317,9 @@
 <section>
   <div class="wrap">
     <div class="cta">
-      <h2 data-i18n="cta.h2">Your next idea is already a complaint.</h2>
-      <p data-i18n="cta.p">Thousands of people are describing problems they'd pay to fix. PainBase hands them to you, validated and sorted.</p>
-      <button class="btn btn-primary" data-i18n="cta.btn" onclick="(async()=>{ const u=typeof PBAuth!=='undefined'?await PBAuth.getSession():null; u?window.location.href='painbase-dashboard.html':PBAuthModal.open('signup'); })()">Start hunting — free</button>
+      <h2>Your next idea is already a complaint.</h2>
+      <p>Thousands of people are describing problems they'd pay to fix. PainBase hands them to you, validated and sorted.</p>
+      <button class="btn btn-primary" onclick="(async()=>{ const u=typeof PBAuth!=='undefined'?await PBAuth.getSession():null; u?window.location.href='painbase-dashboard.html':PBAuthModal.open('signup'); })()">Start hunting — free</button>
     </div>
   </div>
 </section>
@@ -329,16 +328,16 @@
   <div class="wrap foot-in">
     <div>
       <a href="#" class="logo" style="font-size:17px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
-      <div class="foot-note" style="margin-top:10px" data-i18n="footer.tagline">Real problems, mined hourly. Built for builders.</div>
+      <div class="foot-note" style="margin-top:10px">Real problems, mined hourly. Built for builders.</div>
     </div>
     <div class="foot-links">
-      <a href="#explore" data-i18n="footer.browse">Browse</a>
-      <a href="#leaderboard" data-i18n="footer.leaderboard">Leaderboard</a>
-      <a href="#how" data-i18n="footer.how">How it works</a>
-      <a href="painbase-pricing.html" data-i18n="footer.pricing">Pricing</a>
-      <a href="painbase-dashboard.html" data-i18n="footer.dashboard">Dashboard</a>
-      <a href="#" data-i18n="footer.api">API</a>
-      <a href="#" data-i18n="footer.terms">Terms</a>
+      <a href="#explore">Browse</a>
+      <a href="#leaderboard">Leaderboard</a>
+      <a href="#how">How it works</a>
+      <a href="painbase-pricing.html">Pricing</a>
+      <a href="painbase-dashboard.html">Dashboard</a>
+      <a href="#">API</a>
+      <a href="#">Terms</a>
     </div>
   </div>
 </footer>
