@@ -356,7 +356,7 @@
   const search = document.getElementById('search');
   const resultCount = document.getElementById('resultCount');
   let activeTheme = 'all';
-  let _problems = PROBLEMS; // source par défaut (statique)
+  let _problems = [];
 
   const fmt = n => n.toLocaleString('en-US');
 
@@ -387,14 +387,15 @@
         <p class="ai"><span class="badge">AI</span>${p.ai}</p>
         <div class="card-foot">
           <span class="mentions">${fmt(p.mentions)} <span>mentions</span></span>
-          ${p.src.length?`<span class="srcs">${p.src.map(s=>`<span class="src">${s}</span>`).join('')}</span>`:''}
+          ${p.src&&p.src.length?`<span class="srcs">${p.src.map(s=>`<span class="src">${s}</span>`).join('')}</span>`:''}
         </div>
-      </a>`).join('') : `<div class="empty">No problems match that filter — try another theme.</div>`;
+      </a>`).join('') : `<div class="empty" style="padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Aucun problème trouvé pour ce filtre.</div>`;
   }
 
   function renderBoard(){
     const src = _problems.map(normalize);
     const ranked = [...src].sort((a,b)=>b.mentions-a.mentions).slice(0,8);
+    if(!ranked.length) return;
     const max = ranked[0].mentions;
     board.querySelectorAll('a.row').forEach(r=>r.remove());
     ranked.forEach((p,i)=>{
@@ -421,36 +422,26 @@
   });
   search.addEventListener('input',render);
 
-  // Charge depuis Supabase si configuré, sinon garde les données statiques
+  // Affiche un spinner pendant le chargement
+  grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Chargement des problèmes…</div>`;
+
+  // Charge depuis Supabase
   async function loadData(){
-    if(!window.PB_CONFIGURED) return;
     const {data, error} = await PBData.getProblems();
     if(!error && data && data.length){
       _problems = data;
       render();
       renderBoard();
+      // Met à jour le compteur avec le vrai nombre
+      document.getElementById('ct1').textContent = fmt(data.length);
+    } else {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Aucun problème disponible pour le moment.<br>Le pipeline collecte des données — réessaie dans quelques instants.</div>`;
     }
   }
   loadData();
 
-  // count-up
-  function countUp(el){
-    const to=+el.dataset.to; const dur=1200; const start=performance.now();
-    function tick(now){
-      const k=Math.min(1,(now-start)/dur);
-      const v=Math.floor((1-Math.pow(1-k,3))*to);
-      el.textContent = to>=1000 ? (v>=1000?fmt(v):v) : v;
-      if(k<1)requestAnimationFrame(tick);
-      else el.textContent = to>=100000 ? fmt(to).replace(/,000$/,'k+').replace(/(\d+),(\d{3})$/,'$1$2') : fmt(to);
-    }
-    requestAnimationFrame(tick);
-  }
-  document.getElementById('ct3').dataset.to=312000;
-  ['ct1','ct2','ct3'].forEach(id=>countUp(document.getElementById(id)));
-  setTimeout(()=>{document.getElementById('ct1').textContent='48,213';document.getElementById('ct3').textContent='312k+';},1300);
-
-  render();
-  renderBoard();
+  // Compteurs statiques (sources actives)
+  document.getElementById('ct2').textContent = '5';  // Reddit, HN, Dev.to, Facebook, Twitter
 </script>
 </body>
 </html>

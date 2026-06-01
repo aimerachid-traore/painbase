@@ -278,23 +278,40 @@ function updateStats() {
 }
 
 // ── Render activity feed ─────────────────────────────────────────
-function renderActivity() {
+async function renderActivity() {
   const content = document.getElementById('dashContent');
-  // Static demo activity — replace with real Supabase query when ready
-  const items = [
-    { dot:'', text:'Saved <strong>Freelancers hate chasing late invoices</strong>', time:'2 hours ago' },
-    { dot:'green', text:'New problem trending: <strong>ADHD budgeting apps</strong> +38% this week', time:'5 hours ago' },
-    { dot:'gold', text:'Saved <strong>Devs rebuild auth + billing boilerplate</strong>', time:'Yesterday' },
-    { dot:'green', text:'PainBase added 3 new problems in <strong>Productivity</strong>', time:'2 days ago' },
-    { dot:'', text:'Saved <strong>Students can\'t turn lecture recordings into notes</strong>', time:'3 days ago' },
-  ];
+  content.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Chargement…</div>`;
+
+  // Derniers problèmes ajoutés (triés par date)
+  const { data } = await _sb.from('problems')
+    .select('id, title, theme, mentions, created_at')
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (!data || !data.length) {
+    content.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Aucune activité récente.</div>`;
+    return;
+  }
+
+  const fmt = n => n?.toLocaleString('en-US') ?? '—';
+  const timeAgo = d => {
+    const diff = Date.now() - new Date(d).getTime();
+    const h = Math.floor(diff / 3600000);
+    if (h < 1) return 'Just now';
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h/24)}d ago`;
+  };
+
   content.innerHTML = `
-    <div class="saved-head rv"><h2>Recent activity</h2></div>
+    <div class="saved-head rv"><h2>Derniers problèmes collectés</h2></div>
     <div class="activity-list rv" style="animation-delay:.05s">
-      ${items.map(a => `
+      ${data.map(p => `
         <div class="act-row">
-          <div class="act-dot ${a.dot}"></div>
-          <div><div class="act-text">${a.text}</div><div class="act-time">${a.time}</div></div>
+          <div class="act-dot green"></div>
+          <div>
+            <div class="act-text"><a href="painbase-detail.html#id=${p.id}" style="color:var(--ember)">${p.title}</a> · <span style="color:var(--gold)">${p.theme}</span></div>
+            <div class="act-time">${fmt(p.mentions)} mentions · ${timeAgo(p.created_at)}</div>
+          </div>
         </div>`).join('')}
     </div>`;
 }
@@ -341,12 +358,10 @@ async function loadSaved() {
     savedIds = await PBData.getSavedIds();
   }
 
-  // Get all problems (from Supabase or static fallback)
-  let allProblems = PROBLEMS;
-  if (window.PB_CONFIGURED) {
-    const { data } = await PBData.getProblems();
-    if (data && data.length) allProblems = data;
-  }
+  // Charge les problèmes depuis Supabase
+  let allProblems = [];
+  const { data: probData } = await PBData.getProblems();
+  if (probData && probData.length) allProblems = probData;
 
   renderSaved(savedIds, allProblems);
 }

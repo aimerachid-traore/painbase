@@ -323,11 +323,9 @@ function buildChart(container, data){
   container.appendChild(labelsEl);
 }
 
-function renderPage(p){
+function renderPage(p, related=[]){
   const d=p.detail;
   document.title=`PainBase — ${p.t}`;
-
-  const related = getRelatedProblems(p.id, 3);
 
   const app=document.getElementById('app');
   app.innerHTML=`
@@ -599,22 +597,20 @@ async function init(){
   const id=getParam('id');
   if(!id){ window.location.href='painbase-landing.html'; return; }
 
-  document.getElementById('app').innerHTML='<div style="padding:80px 0;text-align:center;font-family:\'JetBrains Mono\',monospace;color:var(--ink-faint)">Loading…</div>';
+  document.getElementById('app').innerHTML='<div style="padding:80px 0;text-align:center;font-family:\'JetBrains Mono\',monospace;color:var(--ink-faint)">Chargement…</div>';
   window.scrollTo(0,0);
 
-  // 1. Essaie Supabase
-  if(window.PB_CONFIGURED){
-    const {data, error} = await PBData.getProblem(id);
-    if(!error && data){
-      renderPage(fromSupabase(data));
-      return;
-    }
+  const {data, error} = await PBData.getProblem(id);
+  if(!error && data){
+    // Charge les problèmes liés depuis Supabase
+    const relRaw = await PBData.getRelated(id, data.theme, 3);
+    const related = relRaw.map(r=>({
+      id:r.id, t:r.title, theme:r.theme, mentions:r.mentions, trend:r.trend_pct
+    }));
+    renderPage(fromSupabase(data), related);
+  } else {
+    renderNotFound();
   }
-
-  // 2. Fallback statique
-  const problem = getProblemById(id);
-  if(problem) renderPage(problem);
-  else renderNotFound();
 }
 
 window.addEventListener('hashchange', init);
