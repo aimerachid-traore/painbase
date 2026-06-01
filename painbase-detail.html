@@ -204,6 +204,8 @@
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
+  if (typeof window.t !== 'function') window.t = k => k;
+
 const WEEKS = ['W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24','W25'];
 const fmt = n => n.toLocaleString('en-US');
 

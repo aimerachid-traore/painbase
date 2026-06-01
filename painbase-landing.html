@@ -351,6 +351,9 @@
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
+  // Garde : si i18n.js n'est pas chargé (cache Cloudflare, réseau), t() retourne la clé
+  if (typeof window.t !== 'function') window.t = k => k;
+
   const grid = document.getElementById('grid');
   const board = document.getElementById('board');
   const chips = document.getElementById('themes');
