@@ -3,5 +3,4 @@ pipeline/.env
 pipeline/.env.local
 .claude/
 
-# Généré au build depuis les variables Netlify — ne jamais committer
-supabase.config.js
+# supabase.config.js contient uniquement la clé PUBLIQUE (anon) — safe à committer
