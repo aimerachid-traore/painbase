@@ -370,6 +370,7 @@
   }
 
   let _searchTimer = null;
+  let _stepTimer   = null;
 
   function render(){
     const q = search.value.trim().toLowerCase();
@@ -407,7 +408,7 @@
         <div id="aiSearchResult"></div>
       </div>`;
       const stepEl = document.getElementById('aiSearchStep');
-      const stepTimer = setInterval(() => {
+      _stepTimer = setInterval(() => {
         stepIdx = Math.min(stepIdx+1, steps.length-1);
         if(stepEl) stepEl.textContent = '⟳ ' + steps[stepIdx];
       }, 2000);
@@ -426,9 +427,9 @@
     try {
       const res  = await fetch(`/search?q=${encodeURIComponent(q)}`);
       const data = await res.json();
-      clearInterval(stepTimer);
+      clearInterval(_stepTimer); _stepTimer = null;
       const stepEl2 = document.getElementById('aiSearchStep');
-      if(stepEl2) stepEl2.textContent = `✓ ${data.posts_found || 0} posts analysés`;
+      if(stepEl2) stepEl2.textContent = `✓ ${data.posts_found || 0} ${t('search.posts_analyzed')}`;
 
       if(!data.ideas || !data.ideas.length){
         box.innerHTML = `<span style="color:var(--ink-faint)">${t('search.no_opportunity')}</span>`;
@@ -451,7 +452,7 @@
           ${t('search.sources')} ${data.sources.map(s=>`<a href="${s.url}" target="_blank" style="color:var(--ink-faint);text-decoration:underline">${s.platform.toUpperCase()}</a>`).join(' · ')}
         </div>`:''}`;
     } catch(e) {
-      clearInterval(stepTimer);
+      clearInterval(_stepTimer); _stepTimer = null;
       if(box) box.innerHTML = `<span style="color:var(--ink-faint)">${t('search.error')}</span>`;
     }
   }
