@@ -105,4 +105,5 @@ const PBData = {
 };
 
 // Détecte si Supabase est configuré (clé non-placeholder)
-const PB_CONFIGURED = !SUPABASE_CONFIG.url.includes('YOUR_SUPABASE');
+// Doit être sur window pour être accessible depuis les scripts inline
+window.PB_CONFIGURED = !SUPABASE_CONFIG.url.includes('YOUR_SUPABASE');

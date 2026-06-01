@@ -319,7 +319,7 @@
     <div class="cta">
       <h2>Your next idea is already a complaint.</h2>
       <p>Thousands of people are describing problems they'd pay to fix. PainBase hands them to you, validated and sorted.</p>
-      <button class="btn btn-primary">Start hunting — free</button>
+      <button class="btn btn-primary" onclick="(async()=>{ const u=typeof PBAuth!=='undefined'?await PBAuth.getSession():null; u?window.location.href='painbase-dashboard.html':PBAuthModal.open('signup'); })()">Start hunting — free</button>
     </div>
   </div>
 </section>
