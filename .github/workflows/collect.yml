@@ -2,7 +2,7 @@ name: PainBase — Collecte des données
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # Toutes les 6 heures (00h, 06h, 12h, 18h UTC)
+    - cron: '0 */4 * * *'   # Toutes les 4 heures (00h, 04h, 08h, 12h, 16h, 20h UTC)
   workflow_dispatch:          # Lancement manuel depuis GitHub UI → Actions → Run workflow
 
 jobs:

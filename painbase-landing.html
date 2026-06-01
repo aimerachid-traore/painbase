@@ -368,6 +368,8 @@
     } : p; // déjà au format statique
   }
 
+  let _searchTimer = null;
+
   function render(){
     const q = search.value.trim().toLowerCase();
     const list = _problems.map(normalize).filter(p=>{
@@ -376,20 +378,71 @@
       return okTheme && okQ;
     });
     resultCount.textContent = list.length + (list.length===1?' problem':' problems');
-    grid.innerHTML = list.length ? list.map(p=>`
-      <a class="card ${p.hot?'hot':''}" href="painbase-detail.html#id=${p.id}" style="text-decoration:none;color:inherit">
-        <div class="intensity"></div>
-        <div class="card-top">
-          <span class="tag">${p.theme}</span>
-          <span class="trend">▲ ${p.trend}%</span>
+
+    if(list.length){
+      grid.innerHTML = list.map(p=>`
+        <a class="card ${p.hot?'hot':''}" href="painbase-detail.html#id=${p.id}" style="text-decoration:none;color:inherit">
+          <div class="intensity"></div>
+          <div class="card-top">
+            <span class="tag">${p.theme}</span>
+            <span class="trend">▲ ${p.trend}%</span>
+          </div>
+          <h3>${p.t}</h3>
+          <p class="ai"><span class="badge">AI</span>${p.ai}</p>
+          <div class="card-foot">
+            <span class="mentions">${fmt(p.mentions)} <span>mentions</span></span>
+            ${p.src&&p.src.length?`<span class="srcs">${p.src.map(s=>`<span class="src">${s}</span>`).join('')}</span>`:''}
+          </div>
+        </a>`).join('');
+    } else if(q.length >= 3) {
+      // Pas de résultat → scraping IA à la demande
+      clearTimeout(_searchTimer);
+      grid.innerHTML = `<div id="aiSearchBox" style="grid-column:1/-1;padding:40px 28px;border:1px solid var(--line);border-radius:18px;background:var(--panel)">
+        <div style="font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:8px">Recherche IA en temps réel</div>
+        <div style="font-size:15px;color:var(--ink);margin-bottom:20px">Aucun résultat en base pour "<strong>${q}</strong>" — je scrape Reddit & HN maintenant…</div>
+        <div id="aiSearchResult" style="color:var(--ink-dim);font-size:13px">
+          <span style="font-family:'JetBrains Mono'">⟳ Analyse en cours…</span>
         </div>
-        <h3>${p.t}</h3>
-        <p class="ai"><span class="badge">AI</span>${p.ai}</p>
-        <div class="card-foot">
-          <span class="mentions">${fmt(p.mentions)} <span>mentions</span></span>
-          ${p.src&&p.src.length?`<span class="srcs">${p.src.map(s=>`<span class="src">${s}</span>`).join('')}</span>`:''}
+      </div>`;
+      _searchTimer = setTimeout(() => liveSearch(q), 800);
+    } else if(q.length > 0) {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Tape au moins 3 caractères pour lancer une recherche.</div>`;
+    } else {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Aucun problème disponible.</div>`;
+    }
+  }
+
+  // ── Recherche IA à la demande ─────────────────────────────────
+  async function liveSearch(q) {
+    const box = document.getElementById('aiSearchResult');
+    if(!box) return;
+    try {
+      const res  = await fetch(`/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+
+      if(!data.ideas || !data.ideas.length){
+        box.innerHTML = `<span style="color:var(--ink-faint)">Aucune opportunité détectée pour ce mot-clé. Essaie un terme plus spécifique.</span>`;
+        return;
+      }
+
+      box.innerHTML = `
+        <div style="font-size:13px;color:var(--ink-faint);margin-bottom:16px;font-family:'JetBrains Mono'">${data.posts_found} posts analysés sur Reddit & HN</div>
+        <div style="display:grid;gap:12px">
+          ${data.ideas.map(idea=>`
+            <div style="background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:18px 20px">
+              <div style="font-weight:700;font-size:15px;color:var(--ink);margin-bottom:8px">${idea.title}</div>
+              <div style="font-size:13.5px;color:var(--ink-dim);margin-bottom:8px">${idea.problem}</div>
+              <div style="font-size:13px;color:var(--ember)">${idea.opportunity}</div>
+              ${idea.confidence?`<div style="margin-top:10px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)">Confiance IA : ${idea.confidence}/100</div>`:''}
+            </div>`).join('')}
         </div>
-      </a>`).join('') : `<div class="empty" style="padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Aucun problème trouvé pour ce filtre.</div>`;
+        ${data.sources&&data.sources.length?`
+        <div style="margin-top:16px;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-faint)">
+          Sources : ${data.sources.map(s=>`<a href="${s.url}" target="_blank" style="color:var(--ink-faint);text-decoration:underline">${s.platform.toUpperCase()}</a>`).join(' · ')}
+        </div>`:''}`;
+    } catch(e) {
+      if(box) box.innerHTML = `<span style="color:var(--ink-faint)">Erreur lors de la recherche. Réessaie dans un instant.</span>`;
+    }
   }
 
   function renderBoard(){
