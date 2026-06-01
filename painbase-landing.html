@@ -497,16 +497,25 @@
 
   // Charge depuis Supabase
   async function loadData(){
-    const {data, error} = await PBData.getProblems();
-    if(!error && data && data.length){
-      _problems = data;
-      updateThemeChips(data);
-      render();
-      renderBoard();
-      document.getElementById('ct1').textContent = fmt(data.length);
-    } else {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No problems available yet.<br>The pipeline is collecting data — check back in a few minutes.</div>`;
-      console.error('Supabase error:', error);
+    try {
+      const {data, error} = await PBData.getProblems();
+      if(error) throw error;
+      if(data && data.length){
+        _problems = data;
+        updateThemeChips(data);
+        render();
+        renderBoard();
+        document.getElementById('ct1').textContent = fmt(data.length);
+      } else {
+        _problems = [];
+        render();
+        grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No problems yet — the pipeline will populate the database shortly.</div>`;
+      }
+    } catch(err) {
+      grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:12px">
+        ⚠️ Could not load problems<br><span style="font-size:11px;margin-top:6px;display:block">${err?.message || 'Check browser console for details'}</span>
+      </div>`;
+      console.error('[PainBase] Supabase load error:', err);
     }
   }
   loadData();
