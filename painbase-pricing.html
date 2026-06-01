@@ -164,151 +164,60 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
 <header class="pricing-hero">
   <div class="wrap">
     <div class="eyebrow rv">Pricing</div>
-    <h1 class="rv" style="animation-delay:.08s">Simple pricing for <em>serious</em> builders.</h1>
-    <p class="rv" style="animation-delay:.15s">Start free. Upgrade when you find the problem worth pursuing.</p>
-
-    <div class="billing-toggle rv" style="animation-delay:.2s">
-      <span>Monthly</span>
-      <button class="toggle-pill" id="billingToggle" aria-label="Toggle billing period">
-        <div class="toggle-knob"></div>
-      </button>
-      <span>Annual</span>
-      <span class="annual-badge" id="annualBadge" style="opacity:0">Save 30%</span>
-    </div>
+    <h1 class="rv" style="animation-delay:.08s">100% <em>gratuit</em>.<br>Pour toujours.</h1>
+    <p class="rv" style="animation-delay:.15s">PainBase est entièrement gratuit pendant la bêta. Crée un compte, explore tous les problèmes, sauvegarde ceux qui t'intéressent.</p>
   </div>
 </header>
 
-<!-- PLANS -->
-<section>
+<!-- PLAN UNIQUE -->
+<section style="padding:0 0 60px">
   <div class="wrap">
-    <div class="plans rv" style="animation-delay:.25s">
 
-      <!-- FREE -->
-      <div class="plan">
-        <div class="plan-name">Free</div>
-        <div class="plan-price"><span class="amount">$0</span><span class="period">/mo</span></div>
-        <div class="plan-desc">Browse and explore. Perfect for validating your first idea.</div>
-        <button class="plan-btn ghost" onclick="handlePlanClick('free')">Get started free</button>
-        <div class="features">
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Access to top 20 problems</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI brief for each problem</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Trend charts</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Save up to 5 problems</div>
-          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Full source posts</div>
-          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Opportunity scores</div>
-          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Competitor analysis</div>
-          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>API access</div>
-        </div>
-      </div>
-
-      <!-- PRO — featured -->
-      <div class="plan featured">
-        <div class="plan-badge">Most popular</div>
-        <div class="plan-name">Pro</div>
+    <div class="rv" style="animation-delay:.22s;max-width:520px;margin:0 auto">
+      <div class="plan featured" style="text-align:left">
+        <div class="plan-badge">Bêta — gratuit</div>
+        <div class="plan-name">Free forever</div>
         <div class="plan-price">
-          <span class="amount" id="proPrice">$29</span>
+          <span class="amount">$0</span>
           <span class="period">/mo</span>
-          <span class="old" id="proOld" style="display:none">$29</span>
         </div>
-        <div class="plan-desc">Everything you need to find, validate, and build your next product.</div>
-        <button class="plan-btn primary" onclick="handlePlanClick('pro')">Start 7-day free trial</button>
+        <div class="plan-desc">Tout le contenu, sans restriction, sans carte bancaire.</div>
+        <button class="plan-btn primary" onclick="(async()=>{ const u=typeof PBAuth!=='undefined'?await PBAuth.getSession():null; u?window.location.href='painbase-dashboard.html':PBAuthModal.open('signup'); })()">
+          Créer un compte gratuit →
+        </button>
         <div class="features">
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>All 48,000+ problems</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Full AI analysis & product angles</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited source posts</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Opportunity & competition scores</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Competitor breakdown</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Unlimited saved problems</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Weekly trend digests by email</div>
-          <div class="feat missing"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>API access</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Accès à tous les problèmes</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Analyse IA complète + angle produit</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Scores demande / concurrence</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Posts sources Reddit, HN, Twitter, Facebook</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Graphes de tendance</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sauvegarde illimitée de problèmes</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Mise à jour automatique toutes les 6h</div>
+          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Aucune carte bancaire requise</div>
         </div>
       </div>
 
-      <!-- BUILDER -->
-      <div class="plan">
-        <div class="plan-name">Builder</div>
-        <div class="plan-price">
-          <span class="amount" id="builderPrice">$79</span>
-          <span class="period">/mo</span>
-          <span class="old" id="builderOld" style="display:none">$79</span>
-        </div>
-        <div class="plan-desc">For teams and agencies doing systematic opportunity research at scale.</div>
-        <button class="plan-btn ghost" onclick="handlePlanClick('builder')">Start 7-day free trial</button>
-        <div class="features">
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Everything in Pro</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>REST API access</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>5 team seats</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Custom keyword monitoring</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Slack / webhook alerts</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Export to CSV / JSON</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority support</div>
-          <div class="feat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>White-label reports (PDF)</div>
-        </div>
-      </div>
-
+      <p class="rv" style="animation-delay:.3s;text-align:center;margin-top:18px;font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint)">
+        Des plans premium pourront être ajoutés à l'avenir. Tu seras prévenu.
+      </p>
     </div>
 
-    <!-- Social proof -->
-    <div class="rv" style="animation-delay:.35s;text-align:center;margin-top:36px;font-size:13.5px;color:var(--ink-faint)">
-      No credit card required on free plan &nbsp;·&nbsp; Cancel anytime &nbsp;·&nbsp; 7-day free trial on paid plans
-    </div>
-  </div>
-</section>
-
-<!-- COMPARISON TABLE -->
-<section class="compare rv" style="animation-delay:.3s">
-  <div class="wrap">
-    <h2>Compare plans</h2>
-    <div style="overflow-x:auto">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th style="width:44%">Feature</th>
-            <th>Free</th>
-            <th style="color:var(--ember)">Pro</th>
-            <th>Builder</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="section-head"><td colspan="4">Problem access</td></tr>
-          <tr><td>Problems in database</td><td>Top 20</td><td class="pro-col">All 48k+</td><td>All 48k+</td></tr>
-          <tr><td>AI brief per problem</td><td class="check">✓</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
-          <tr><td>Full AI analysis & product angle</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
-          <tr><td>Opportunity & demand scores</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
-          <tr><td>Source posts (Reddit/HN)</td><td>3 per problem</td><td class="pro-col">Unlimited</td><td>Unlimited</td></tr>
-          <tr><td>Competitor breakdown</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
-          <tr class="section-head"><td colspan="4">Research tools</td></tr>
-          <tr><td>Saved problems</td><td>5</td><td class="pro-col">Unlimited</td><td>Unlimited</td></tr>
-          <tr><td>Search & filters</td><td class="check">✓</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
-          <tr><td>Weekly trend digest (email)</td><td class="cross">—</td><td class="pro-col check">✓</td><td class="check">✓</td></tr>
-          <tr><td>Custom keyword monitoring</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
-          <tr class="section-head"><td colspan="4">Team & export</td></tr>
-          <tr><td>Team seats</td><td>1</td><td class="pro-col">1</td><td>5</td></tr>
-          <tr><td>REST API</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
-          <tr><td>CSV / JSON export</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
-          <tr><td>Slack / webhook alerts</td><td class="cross">—</td><td class="cross">—</td><td class="check">✓</td></tr>
-        </tbody>
-      </table>
+    <!-- CTA bottom -->
+    <div class="rv" style="animation-delay:.35s;margin-top:56px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,var(--panel-2),var(--bg-2));padding:52px 40px;text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;bottom:-140px;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,var(--ember-soft),transparent 65%)"></div>
+      <h2 style="font-family:'Fraunces';font-size:clamp(24px,3vw,36px);font-weight:600;letter-spacing:-.02em;position:relative">Ton prochain projet est déjà une plainte.</h2>
+      <p style="color:var(--ink-dim);margin:14px auto 28px;max-width:44ch;font-size:16px;position:relative">Des milliers de personnes décrivent des problèmes qu'elles paieraient pour résoudre. PainBase te les livre, validés et triés.</p>
+      <button class="btn btn-primary" style="position:relative;padding:13px 28px;font-size:16px" onclick="PBAuthModal.open('signup')">Commencer gratuitement →</button>
     </div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section class="faq rv" style="animation-delay:.3s">
-  <div class="wrap">
-    <h2>Frequently asked</h2>
-    <div id="faqList"></div>
-  </div>
-</section>
-
-<!-- BOTTOM CTA -->
 <section style="padding:0 0 80px">
   <div class="wrap">
-    <div style="border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,var(--panel-2),var(--bg-2));padding:56px 40px;text-align:center;position:relative;overflow:hidden">
-      <div style="position:absolute;bottom:-140px;left:50%;transform:translateX(-50%);width:500px;height:300px;background:radial-gradient(ellipse,var(--ember-soft),transparent 65%)"></div>
-      <h2 style="font-family:'Fraunces';font-size:clamp(26px,3.5vw,38px);font-weight:600;letter-spacing:-.02em;position:relative">Your next idea is already a complaint.</h2>
-      <p style="color:var(--ink-dim);margin:14px auto 28px;max-width:44ch;font-size:16px;position:relative">Start free — no credit card. Upgrade when you find the problem worth building for.</p>
-      <button class="btn btn-primary" style="position:relative;padding:13px 28px;font-size:16px" onclick="PBAuthModal.open('signup')">Start hunting — it's free</button>
+    <div class="faq rv" style="animation-delay:.4s">
+      <h2>Questions fréquentes</h2>
+      <div id="faqList"></div>
     </div>
   </div>
 </section>
@@ -332,105 +241,19 @@ nav{position:sticky;top:0;z-index:50;background:rgba(16,14,11,.78);backdrop-filt
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
-// ── Notification toast ───────────────────────────────────────────
-function toast(html, color='var(--ember)') {
-  const el = document.createElement('div');
-  el.style.cssText = `position:fixed;top:24px;left:50%;transform:translateX(-50%);
-    background:#1B1712;border:1px solid ${color};color:#F3ECDF;padding:14px 22px;
-    border-radius:12px;z-index:9999;font-family:Archivo,sans-serif;font-size:14.5px;
-    text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:opacity .3s;max-width:90vw`;
-  el.innerHTML = html;
-  document.body.appendChild(el);
-  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(),300); }, 4000);
-}
-
-// ── Boutons de plan → Stripe Checkout ────────────────────────────
-async function handlePlanClick(plan) {
-  const user = typeof PBAuth !== 'undefined' ? await PBAuth.getSession() : null;
-
-  if (!user) {
-    if (typeof PBAuthModal !== 'undefined') PBAuthModal.open('signup');
-    return;
-  }
-
-  if (plan === 'free') {
-    window.location.href = 'painbase-dashboard.html';
-    return;
-  }
-
-  // Appel à la Netlify Function pour créer la session Stripe
-  const btn = event.target.closest('button');
-  const origText = btn.textContent;
-  btn.textContent = 'Loading…';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('/.netlify/functions/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        plan,
-        email:   user.email,
-        billing: annual ? 'annual' : 'monthly'
-      })
-    });
-
-    const { url, error } = await res.json();
-
-    if (error) { toast(`❌ ${error}`); return; }
-
-    // Stripe checkout → redirige vers la page de paiement Stripe
-    window.location.href = url;
-
-  } catch(err) {
-    toast('❌ Erreur réseau — réessaie dans un instant.');
-  } finally {
-    btn.textContent = origText;
-    btn.disabled = false;
-  }
-}
-
-// Gère le retour après paiement réussi
-if (new URLSearchParams(location.search).get('waitlist') === 'true') {
-  const plan = new URLSearchParams(location.search).get('plan') || 'pro';
-  toast(`✅ Inscrit sur la liste d'attente pour le plan <strong>${plan}</strong> — on te contacte dès l'ouverture !`, 'var(--green)');
-}
-
-// ── Billing toggle ───────────────────────────────────────────────
-const toggle = document.getElementById('billingToggle');
-const badge  = document.getElementById('annualBadge');
-let annual = false;
-const PRICES = { pro:{ monthly:29, annual:20 }, builder:{ monthly:79, annual:55 } };
-
-toggle.addEventListener('click', () => {
-  annual = !annual;
-  toggle.classList.toggle('annual', annual);
-  badge.style.opacity = annual ? '1' : '0';
-  document.getElementById('proPrice').textContent     = '$' + (annual ? PRICES.pro.annual : PRICES.pro.monthly);
-  document.getElementById('builderPrice').textContent = '$' + (annual ? PRICES.builder.annual : PRICES.builder.monthly);
-  document.getElementById('proOld').style.display     = annual ? '' : 'none';
-  document.getElementById('builderOld').style.display = annual ? '' : 'none';
-  document.getElementById('proOld').textContent       = '$' + PRICES.pro.monthly;
-  document.getElementById('builderOld').textContent   = '$' + PRICES.builder.monthly;
-});
-
 // ── FAQ ──────────────────────────────────────────────────────────
 const FAQS = [
-  { q:'Is PainBase really free to start?',
-    a:'Yes. No credit card required. The free plan gives you access to the top 20 trending problems with AI briefs, trend charts, and up to 5 saved problems. Upgrade when you want the full database and deeper analysis.' },
-  { q:'Where does the data come from?',
-    a:'PainBase continuously mines Reddit (60+ subreddits) and Hacker News. Every post is classified by AI to identify genuine unresolved pain points. Posts are clustered by topic so 200+ separate complaints become one quantified problem with a verified mention count.' },
-  { q:'Can I cancel anytime?',
-    a:'Absolutely. No lock-in, no cancellation fees. If you cancel, your plan stays active until the end of the billing period, then downgrades to free.' },
-  { q:'What\'s the difference between the Pro and Builder plans?',
-    a:'Pro is designed for solo founders and indie hackers — it gives you the full research toolkit. Builder adds API access, 5 team seats, custom keyword monitoring, Slack alerts, and CSV/JSON export for teams doing systematic research at scale.' },
-  { q:'Do you offer refunds?',
-    a:'Yes. If you\'re not satisfied within the first 7 days of a paid plan, we\'ll refund you in full — no questions asked.' },
-  { q:'Is there a student or startup discount?',
-    a:'Yes — reach out via the support email with a .edu address or YC/Antler acceptance letter and we\'ll apply a 40% discount.' },
+  { q:'PainBase est-il vraiment gratuit ?',
+    a:'Oui, complètement. Aucune carte bancaire requise, aucun abonnement. Accès à tous les problèmes, toutes les analyses IA et toutes les fonctionnalités — sans limite.' },
+  { q:'D\'où viennent les données ?',
+    a:'PainBase collecte en continu Reddit (60+ subreddits) et Hacker News. Chaque post est analysé par IA pour identifier de vraies douleurs non résolues. Les posts similaires sont regroupés pour former un problème quantifié avec un comptage de mentions vérifié.' },
+  { q:'Dois-je créer un compte ?',
+    a:'Un compte gratuit te permet de sauvegarder des problèmes et de retrouver ta liste à tout moment. Tu peux aussi explorer librement sans compte.' },
+  { q:'Les données sont-elles mises à jour régulièrement ?',
+    a:'Oui, la base est mise à jour automatiquement toutes les 6 heures avec les nouveaux problèmes détectés sur Reddit et Hacker News.' },
 ];
 
-const faqList = document.getElementById('faqList');
+const faqContainer = document.getElementById('faqList');
 FAQS.forEach(({ q, a }) => {
   const item = document.createElement('div');
   item.className = 'faq-item';
@@ -442,7 +265,7 @@ FAQS.forEach(({ q, a }) => {
     document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
     if (!open) item.classList.add('open');
   });
-  faqList.appendChild(item);
+  faqContainer.appendChild(item);
 });
 </script>
 </body>

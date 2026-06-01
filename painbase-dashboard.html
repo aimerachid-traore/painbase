@@ -351,16 +351,6 @@ async function loadSaved() {
   renderSaved(savedIds, allProblems);
 }
 
-// Message de succès après paiement Stripe
-if (new URLSearchParams(location.search).get('success') === 'true') {
-  const plan = new URLSearchParams(location.search).get('plan') || 'pro';
-  const banner = document.createElement('div');
-  banner.style.cssText = 'background:rgba(121,197,138,.12);border:1px solid rgba(121,197,138,.3);color:#79C58A;padding:14px 22px;border-radius:12px;margin:20px 0;text-align:center;font-size:15px';
-  banner.innerHTML = `🎉 <strong>Plan ${plan.charAt(0).toUpperCase()+plan.slice(1)} activé !</strong> Bienvenue dans PainBase Pro.`;
-  document.querySelector('.wrap').insertBefore(banner, document.querySelector('.dash-hero'));
-  history.replaceState({}, '', 'painbase-dashboard.html'); // nettoie l'URL
-}
-
 // Toujours charger l'état réel — pas de démo
 PBAuth.onAuthChange(() => loadSaved());
 loadSaved();
