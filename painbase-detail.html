@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="i18n.js"></script>
 <link rel="stylesheet" href="auth-ui.css">
 <link rel="stylesheet" href="mobile-nav.css">
 <style>
@@ -204,7 +203,45 @@
 <script src="auth-ui.js"></script>
 <script src="mobile-nav.js"></script>
 <script>
-  if (typeof window.t !== 'function') window.t = k => k;
+  // Hardcoded English strings — no i18n dependency
+  window.t = k => ({
+    'detail.breadcrumb':'Problems',
+    'detail.updated':'updated',
+    'detail.mentions_lbl':'Verified mentions',
+    'detail.growth_lbl':'Growth this week',
+    'detail.src_posts_lbl':'Source posts',
+    'detail.opp_lbl':'Opportunity score',
+    'detail.explore':'Explore product angles →',
+    'detail.save':'Save','detail.saved_btn':'Saved',
+    'detail.share':'Share',
+    'detail.link_copied':'Link copied!',
+    'detail.ai_analysis':'AI Analysis',
+    'detail.how_ai_built':'how this brief was built',
+    'detail.trend_chart':'Mention trend',
+    'detail.trend_meta':'weekly · last 12 weeks',
+    'detail.source_posts':'Source posts',
+    'detail.showing_of': n=>`showing 5 of ${n}`,
+    'detail.more_posts': n=>`See ${n} more posts`,
+    'detail.all_sources_shown': n=>`All ${n} sources shown`,
+    'detail.product_angle':'Product angle:',
+    'detail.gap_none':'None','detail.gap_partial':'Partial',
+    'detail.opp_scores':'Opportunity scores',
+    'detail.demand':'Demand intensity',
+    'detail.competition':'Competition density',
+    'detail.opportunity':'Opportunity gap',
+    'detail.who_complaining':'Who complains',
+    'detail.by_segment':'by segment',
+    'detail.existing_solutions':'Existing solutions',
+    'detail.partial_fits':'partial matches',
+    'detail.related_problems':'Related problems',
+    'detail.comments':'comments',
+    'detail.view_original':'View original',
+    'detail.signin_for_sources':'Sign in to see all sources',
+    'detail.loading':'Loading…',
+    'detail.not_found_h2':'Problem not found',
+    'detail.not_found_p':'This problem may have been removed or the link is invalid.',
+    'detail.browse_all':'Browse all problems',
+  })[k] ?? (x=>x);
 
 const WEEKS = ['W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24','W25'];
 const fmt = n => n.toLocaleString('en-US');
@@ -230,6 +267,10 @@ function countUp(el, to){
 }
 
 function buildChart(container, data){
+  if(!data || data.length < 2){
+    container.innerHTML='<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:\'JetBrains Mono\',monospace;font-size:12px">No trend data yet</div>';
+    return;
+  }
   const W=700, H=160, PAD={t:12,r:12,b:12,l:0};
   const min=Math.min(...data)*0.88, max=Math.max(...data)*1.04;
   const n=data.length;
