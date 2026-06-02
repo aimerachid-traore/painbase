@@ -99,27 +99,36 @@
   .sub{font-size:clamp(16px,2vw,19.5px);color:var(--ink-dim);max-width:54ch;margin-top:22px}
   .sub b{color:var(--ink);font-weight:600}
 
-  /* search */
-  .searchbar{
+  /* search — class + sélecteur structurel (fallback si class corrompu) */
+  .searchbar,header>div>:nth-child(4){
     margin-top:36px;display:flex;align-items:center;gap:0;
     background:#181410;border:1px solid #3A3028;border-radius:16px;
     padding:6px 6px 6px 22px;max-width:600px;
     box-shadow:0 2px 20px rgba(0,0,0,.35);
     transition:border-color .25s,box-shadow .25s;
   }
-  .searchbar:focus-within{
+  .searchbar:focus-within,header>div>:nth-child(4):focus-within{
     border-color:var(--ember);
     box-shadow:0 0 0 3px var(--ember-soft),0 2px 20px rgba(0,0,0,.35);
   }
-  .searchbar input{
+  .searchbar input,header>div>:nth-child(4) input{
     flex:1;background:none;border:none;outline:none;color:var(--ink);
     font-family:'Archivo';font-size:15.5px;padding:8px 12px 8px 0;min-width:0;
   }
-  .searchbar input::placeholder{color:var(--ink-faint)}
-  .searchbar .btn-primary{
-    padding:11px 22px;border-radius:11px;font-size:14px;flex:none;
+  .searchbar input::placeholder,header>div>:nth-child(4) input::placeholder{color:var(--ink-faint)}
+  .searchbar button,header>div>:nth-child(4) button{
+    background:#FF5C38;color:#1a0d08;font-family:'Archivo';font-weight:600;
+    font-size:14px;border:none;cursor:pointer;padding:11px 22px;
+    border-radius:11px;flex:none;transition:transform .15s,box-shadow .2s;
   }
-  .stats{display:flex;gap:40px;margin-top:32px;align-items:flex-start}
+  .searchbar button:hover,header>div>:nth-child(4) button:hover{
+    transform:translateY(-1px);box-shadow:0 6px 20px -6px #FF5C38;
+  }
+  /* stats — class + sélecteur structurel */
+  .stats,header>div>:nth-child(5){
+    display:flex;gap:40px;margin-top:32px;align-items:flex-start;
+  }
+  .stat-sep{width:1px;background:#312A22;align-self:stretch;margin:2px 0}
   .stat{display:flex;flex-direction:column}
   .stat .num{font-family:'JetBrains Mono';font-size:28px;font-weight:700;
     color:var(--ink);line-height:1;letter-spacing:-.02em}
