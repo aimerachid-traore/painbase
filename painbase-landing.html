@@ -530,7 +530,10 @@
         updateThemeChips(data);
         render();
         renderBoard();
-        const ct1=document.getElementById('ct1'); if(ct1) ct1.textContent = fmt(data.length);
+        // Fallback structurel si id="" est corrompu par Cloudflare
+        const ct1 = document.getElementById('ct1')
+          || document.querySelector('header > div > :nth-child(5) > :nth-child(1) > :first-child');
+        if(ct1) ct1.textContent = fmt(data.length);
       } else {
         _problems = [];
         render();

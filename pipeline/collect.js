@@ -269,8 +269,13 @@ Title: {TITLE}
 Content: {CONTENT}
 Source: {SOURCE}
 
+Score these 0-100:
+- score_demand: How urgent/painful is this problem? (100 = people desperately need a solution)
+- score_competition: How many good solutions already exist? (100 = market is saturated)
+- score_opportunity: Startup opportunity gap = high demand + low competition (100 = perfect gap)
+
 JSON only:
-{"is_problem":true/false,"confidence":0-100,"theme":"Productivity|Personal Finance|Health & Fitness|Parenting|Developer Tools|Marketing|Education|Pets|Other","problem_title":"max 12 words","excerpt":"best 2-3 sentences"}`;
+{"is_problem":true/false,"confidence":0-100,"theme":"Productivity|Personal Finance|Health & Fitness|Parenting|Developer Tools|Marketing|Education|Pets|Other","problem_title":"max 12 words","excerpt":"best 2-3 sentences","score_demand":0-100,"score_competition":0-100,"score_opportunity":0-100}`;
 
 async function classify(post) {
   if (!groq) return { is_problem: false };
@@ -308,7 +313,10 @@ async function save(post, cls) {
     pid = cls.problem_title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
     const { error } = await sb.from('problems').upsert({
       id:pid, title:cls.problem_title, theme:cls.theme, mentions:1,
-      trend_pct:0, is_hot:false, ai_brief:cls.excerpt, source_posts:1
+      trend_pct:0, is_hot:false, ai_brief:cls.excerpt, source_posts:1,
+      score_demand:      cls.score_demand      ?? 0,
+      score_competition: cls.score_competition ?? 0,
+      score_opportunity: cls.score_opportunity ?? 0,
     },{ onConflict:'id' });
     if (error) { process.stdout.write(`[DB err: ${error.message.slice(0,50)}]`); return; }
   }
