@@ -101,20 +101,31 @@
 
   /* search */
   .searchbar{
-    margin-top:34px;display:flex;align-items:center;gap:10px;
-    background:#1B1712;border:1.5px solid #3D3428;border-radius:14px;
-    padding:8px 8px 8px 18px;max-width:620px;transition:border-color .2s,box-shadow .2s;
+    margin-top:36px;display:flex;align-items:center;gap:0;
+    background:#181410;border:1px solid #3A3028;border-radius:16px;
+    padding:6px 6px 6px 22px;max-width:600px;
+    box-shadow:0 2px 20px rgba(0,0,0,.35);
+    transition:border-color .25s,box-shadow .25s;
   }
-  .searchbar:focus-within{border-color:var(--ember);box-shadow:0 0 0 4px var(--ember-soft)}
-  .search-ico{flex:none;font-size:18px;color:var(--ink-faint);line-height:1;user-select:none}
+  .searchbar:focus-within{
+    border-color:var(--ember);
+    box-shadow:0 0 0 3px var(--ember-soft),0 2px 20px rgba(0,0,0,.35);
+  }
   .searchbar input{
     flex:1;background:none;border:none;outline:none;color:var(--ink);
-    font-family:'Archivo';font-size:16px;
+    font-family:'Archivo';font-size:15.5px;padding:8px 12px 8px 0;min-width:0;
   }
   .searchbar input::placeholder{color:var(--ink-faint)}
-  .stats{display:flex;gap:34px;margin-top:30px}
-  .stat .num{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--ink)}
-  .stat .lbl{font-size:12.5px;color:var(--ink-faint);letter-spacing:.04em;text-transform:uppercase;margin-top:2px}
+  .searchbar .btn-primary{
+    padding:11px 22px;border-radius:11px;font-size:14px;flex:none;
+  }
+  .stats{display:flex;gap:40px;margin-top:32px;align-items:flex-start}
+  .stat{display:flex;flex-direction:column}
+  .stat .num{font-family:'JetBrains Mono';font-size:28px;font-weight:700;
+    color:var(--ink);line-height:1;letter-spacing:-.02em}
+  .stat .lbl{font-size:11.5px;color:var(--ink-faint);letter-spacing:.06em;
+    text-transform:uppercase;margin-top:5px}
+  .stat-sep{width:1px;background:var(--line);align-self:stretch;margin:0}
 
   /* ---------- THEMES ---------- */
   section{padding:18px 0}
@@ -242,15 +253,16 @@
     <p class=”sub rv” style=”animation-delay:.2s”>PainBase mines Reddit, Hacker News &amp; forums for the things people <b>actually complain about</b> — then clusters them into validated, fundable problems. Stop guessing what to build.</p>
 
     <div class=”searchbar rv” style=”animation-delay:.28s”>
-      <span class=”search-ico” aria-hidden=”true”>&#x1F50D;</span>
       <input id=”search” type=”text” placeholder=”Search a problem, e.g. invoices, sleep, onboarding...” autocomplete=”off”>
-      <button class=”btn btn-primary” style=”flex:none”>Search</button>
+      <button class=”btn btn-primary”>Search</button>
     </div>
 
     <div class=”stats rv” style=”animation-delay:.36s”>
-      <div class=”stat”><div class=”num” id=”ct1”>0</div><div class=”lbl”>problems tracked</div></div>
-      <div class=”stat”><div class=”num” id=”ct2”>5</div><div class=”lbl”>sources mined</div></div>
-      <div class=”stat”><div class=”num” id=”ct3”>0</div><div class=”lbl”>posts analysed</div></div>
+      <div class=”stat”><div class=”num” id=”ct1”>0</div><div class=”lbl”>Problems tracked</div></div>
+      <div class=”stat-sep”></div>
+      <div class=”stat”><div class=”num” id=”ct2”>5</div><div class=”lbl”>Sources mined</div></div>
+      <div class=”stat-sep”></div>
+      <div class=”stat”><div class=”num” id=”ct3”>0</div><div class=”lbl”>Posts analysed</div></div>
     </div>
   </div>
 </header>
