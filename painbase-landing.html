@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -237,6 +237,10 @@
   /* reveal */
   .rv{opacity:0;transform:translateY(16px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
   @keyframes rise{to{opacity:1;transform:none}}
+
+  /* ---------- FREE BADGE ---------- */
+  .free-badge{font-size:13px;color:var(--ink-faint);margin-top:11px;display:flex;align-items:center;gap:6px}
+  .free-badge::before{content:"✓";color:var(--green);font-weight:700}
 </style>
 </head>
 <body>
@@ -245,8 +249,8 @@
   <div class="wrap nav-in">
     <a href="painbase-landing.html" class="logo"><span class="mark"></span>PainBase</a>
     <div class="nav-links">
-      <a href="#explore">Browse problems</a>
       <a href="#leaderboard">Leaderboard</a>
+      <a href="#explore">Browse problems</a>
       <a href="#how">How it works</a>
       <a href="painbase-pricing.html">Pricing</a>
       <a href="painbase-dashboard.html">Dashboard</a>
@@ -260,24 +264,37 @@
 
 <header>
   <div class="wrap">
-    <span class=”live rv” style=”animation-delay:.05s”><span class=”dot”></span>Listening to the internet · updated hourly</span>
-    <h1 class=”rv” style=”animation-delay:.12s”>The database of <em>real problems</em> worth solving.</h1>
-    <p class=”sub rv” style=”animation-delay:.2s”>PainBase mines Reddit, Hacker News &amp; forums for the things people <b>actually complain about</b> — then clusters them into validated, fundable problems. Stop guessing what to build.</p>
+    <span class="live rv" style="animation-delay:.05s"><span class="dot"></span>Live · Reddit · HN · Dev.to · updated hourly</span>
+    <h1 class="rv" style="animation-delay:.12s">The database of <em>real problems</em> worth solving.</h1>
+    <p class="sub rv" style="animation-delay:.2s">Stop guessing what to build. Real people complain about real problems — <b>we find them for you.</b></p>
 
-    <div class=”searchbar rv” style=”animation-delay:.28s”>
-      <input id=”search” type=”text” placeholder=”Search a problem, e.g. invoices, sleep, onboarding...” autocomplete=”off”>
-      <button class=”btn btn-primary”>Search</button>
+    <div class="searchbar rv" style="animation-delay:.28s">
+      <input id="search" type="text" placeholder="Search a problem, e.g. invoices, sleep, onboarding..." autocomplete="off">
+      <button class="btn btn-primary">Search</button>
     </div>
+    <div class="free-badge rv" style="animation-delay:.32s">Free during beta · No credit card required</div>
 
-    <div class=”stats rv” style=”animation-delay:.36s”>
-      <div class=”stat”><div class=”num” id=”ct1”>0</div><div class=”lbl”>Problems tracked</div></div>
-      <div class=”stat-sep”></div>
-      <div class=”stat”><div class=”num” id=”ct2”>5</div><div class=”lbl”>Sources mined</div></div>
-      <div class=”stat-sep”></div>
-      <div class=”stat”><div class=”num” id=”ct3”>0</div><div class=”lbl”>Posts analysed</div></div>
+    <div class="stats rv" style="animation-delay:.36s">
+      <div class="stat"><div class="num" id="ct1">—</div><div class="lbl">Problems tracked</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><div class="num" id="ct2">5</div><div class="lbl">Sources mined</div></div>
     </div>
   </div>
 </header>
+
+<section id="leaderboard">
+  <div class="wrap">
+    <div class="shead">
+      <h2>Most complained-about · this week</h2>
+      <span class="meta">ranked by verified mentions</span>
+    </div>
+    <div class="board" id="board">
+      <div class="row head">
+        <div>#</div><div>Problem</div><div class="p-mentions-col">Mentions</div><div>Growth</div><div class="col-bar">Volume</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="explore">
   <div class="wrap">
@@ -302,20 +319,6 @@
   </div>
 </section>
 
-<section id="leaderboard">
-  <div class="wrap">
-    <div class="shead">
-      <h2>Most complained-about · this week</h2>
-      <span class="meta">ranked by verified mentions</span>
-    </div>
-    <div class="board" id="board">
-      <div class="row head">
-        <div>#</div><div>Problem</div><div class="p-mentions-col">Mentions</div><div>Growth</div><div class="col-bar">Volume</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section id="how">
   <div class="wrap">
     <div class="shead"><h2>How PainBase works</h2><span class="meta">listen → cluster → surface</span></div>
@@ -323,7 +326,7 @@
       <div class="step">
         <div class="n">01 / LISTEN</div>
         <h4>We never stop scraping</h4>
-        <p>Workers continuously pull posts & comments from Reddit, Hacker News and forums where people vent about unsolved problems.</p>
+        <p>Workers continuously pull posts &amp; comments from Reddit, Hacker News, Dev.to, Twitter/X and forums where people vent about unsolved problems.</p>
       </div>
       <div class="step">
         <div class="n">02 / CLUSTER</div>
@@ -345,6 +348,7 @@
       <h2>Your next idea is already a complaint.</h2>
       <p>Thousands of people are describing problems they'd pay to fix. PainBase hands them to you, validated and sorted.</p>
       <button class="btn btn-primary" onclick="(async()=>{ const u=typeof PBAuth!=='undefined'?await PBAuth.getSession():null; u?window.location.href='painbase-dashboard.html':PBAuthModal.open('signup'); })()">Start hunting — free</button>
+      <div style="margin-top:14px;font-size:13px;color:var(--ink-faint);position:relative">✓ Free during beta &nbsp;·&nbsp; No credit card required &nbsp;·&nbsp; Cancel anytime</div>
     </div>
   </div>
 </section>
@@ -569,11 +573,12 @@
         _isAuthed = !!user;
         if(user){ render(); renderBoard(); unlockUI(); }
         else { renderGate(data); }
-        const ct1 = document.getElementById('ct1')
-          || document.querySelector('header > div > :nth-child(5) > :nth-child(1) > :first-child');
-        if(ct1) ct1.textContent = fmt(data.length);
+        const ct1el = document.getElementById('ct1');
+        if(ct1el) countUp(ct1el, data.length);
       } else {
         _problems = [];
+        const ct1el = document.getElementById('ct1');
+        if(ct1el) ct1el.textContent = '0';
         if(grid) grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No problems yet — the pipeline will populate the database shortly.</div>`;
       }
     } catch(err) {
@@ -582,6 +587,18 @@
       </div>`;
       console.error('[PainBase] Supabase load error:', err);
     }
+  }
+
+  function countUp(el, target, duration=1200){
+    const start = Date.now();
+    const from = parseInt(el.textContent.replace(/\D/g,''))||0;
+    const tick = () => {
+      const p = Math.min((Date.now()-start)/duration, 1);
+      const ease = 1-Math.pow(1-p, 3);
+      el.textContent = fmt(Math.round(from + (target-from)*ease));
+      if(p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }
 
   // Re-render automatiquement à la connexion / déconnexion
