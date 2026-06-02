@@ -136,6 +136,9 @@
     text-transform:uppercase;margin-top:5px}
   .stat-sep{width:1px;background:var(--line);align-self:stretch;margin:0}
 
+  /* auth gate */
+  .gate-card-locked{opacity:.55;pointer-events:none;user-select:none}
+
   /* ---------- THEMES ---------- */
   section{padding:18px 0}
   .themes{display:flex;gap:9px;flex-wrap:wrap;padding:38px 0 6px}
@@ -520,6 +523,40 @@
       ).join('');
   }
 
+  let _isAuthed = false;
+
+  // ── Gate : affiche 6 cartes teaser + CTA inscription ─────────
+  function renderGate(allData){
+    if(!grid) return;
+    const preview = allData.slice(0,6).map(normalize);
+    const rest = allData.length - preview.length;
+    grid.innerHTML = preview.map(p=>`
+      <a class="card gate-card-locked" href="#" onclick="PBAuthModal.open('signup');return false;" style="text-decoration:none;color:inherit">
+        <div class="intensity"></div>
+        <div class="card-top"><span class="tag">${p.theme}</span><span class="trend">▲ ${p.trend}%</span></div>
+        <h3>${p.t}</h3>
+        <p class="ai"><span class="badge">AI</span>${p.ai}</p>
+        <div class="card-foot"><span class="mentions">${fmt(p.mentions)} <span>mentions</span></span></div>
+      </a>`).join('') + `
+    <div style="grid-column:1/-1;padding:80px 20px 40px;text-align:center;background:linear-gradient(to bottom,transparent,var(--bg) 28%);margin-top:-200px">
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:48px 32px;max-width:460px;margin:0 auto;box-shadow:0 8px 40px rgba(0,0,0,.4)">
+        <div style="font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ember);margin-bottom:16px">Free access required</div>
+        <h3 style="font-family:'Fraunces';font-size:26px;font-weight:600;letter-spacing:-.02em;margin-bottom:12px">+${fmt(rest)} more problems waiting</h3>
+        <p style="color:var(--ink-dim);font-size:15px;margin-bottom:28px;line-height:1.6">Create your free account to unlock all <strong>${fmt(allData.length)} validated problems</strong> — filtered by theme, demand &amp; opportunity score.</p>
+        <button style="width:100%;padding:14px;background:#FF5C38;color:#1a0d08;font-family:'Archivo';font-weight:700;font-size:15.5px;border:none;border-radius:12px;cursor:pointer;transition:transform .15s,box-shadow .2s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 28px -8px #FF5C38'" onmouseout="this.style.transform='';this.style.boxShadow=''" onclick="PBAuthModal.open('signup')">Get free access →</button>
+        <div style="margin-top:16px;font-size:13.5px;color:var(--ink-faint)">Already have an account? <a style="color:var(--ember);cursor:pointer" onclick="PBAuthModal.open('signin')">Sign in</a></div>
+      </div>
+    </div>`;
+    // Verrouille chips + search
+    if(chips){chips.style.opacity='.4';chips.style.pointerEvents='none';}
+    if(search){search.readOnly=true;search.placeholder='Sign in to search all problems…';search.style.cursor='pointer';}
+  }
+
+  function unlockUI(){
+    if(chips){chips.style.opacity='';chips.style.pointerEvents='';}
+    if(search){search.readOnly=false;search.placeholder='Search a problem, e.g. invoices, sleep, onboarding…';search.style.cursor='';}
+  }
+
   // Charge depuis Supabase
   async function loadData(){
     try {
@@ -528,23 +565,31 @@
       if(data && data.length){
         _problems = data;
         updateThemeChips(data);
-        render();
-        renderBoard();
-        // Fallback structurel si id="" est corrompu par Cloudflare
+        const user = window.PB_CONFIGURED ? await PBAuth.getSession() : null;
+        _isAuthed = !!user;
+        if(user){ render(); renderBoard(); unlockUI(); }
+        else { renderGate(data); }
         const ct1 = document.getElementById('ct1')
           || document.querySelector('header > div > :nth-child(5) > :nth-child(1) > :first-child');
         if(ct1) ct1.textContent = fmt(data.length);
       } else {
         _problems = [];
-        render();
-        grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No problems yet — the pipeline will populate the database shortly.</div>`;
+        if(grid) grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No problems yet — the pipeline will populate the database shortly.</div>`;
       }
     } catch(err) {
-      grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:12px">
-        ⚠️ Could not load problems<br><span style="font-size:11px;margin-top:6px;display:block">${err?.message || 'Check browser console for details'}</span>
+      if(grid) grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;border:1px solid var(--line);border-radius:12px;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:12px">
+        ⚠️ Could not load problems<br><span style="font-size:11px;margin-top:6px;display:block">${err?.message||'Check browser console for details'}</span>
       </div>`;
       console.error('[PainBase] Supabase load error:', err);
     }
+  }
+
+  // Re-render automatiquement à la connexion / déconnexion
+  if(window.PB_CONFIGURED){
+    PBAuth.onAuthChange(user => {
+      if(user && !_isAuthed && _problems.length){ _isAuthed=true; render(); renderBoard(); unlockUI(); }
+      else if(!user && _isAuthed && _problems.length){ _isAuthed=false; renderGate(_problems); }
+    });
   }
   loadData();
 </script>

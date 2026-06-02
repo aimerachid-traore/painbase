@@ -281,16 +281,16 @@ function updateStats() {
 // ── Render activity feed ─────────────────────────────────────────
 async function renderActivity() {
   const content = document.getElementById('dashContent');
-  content.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Chargement…</div>`;
+  content.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Loading…</div>`;
 
-  // Derniers problèmes ajoutés (triés par date)
+  // Latest problems added (sorted by date)
   const { data } = await _sb.from('problems')
     .select('id, title, theme, mentions, created_at')
     .order('created_at', { ascending: false })
     .limit(10);
 
   if (!data || !data.length) {
-    content.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Aucune activité récente.</div>`;
+    content.innerHTML = `<div style="padding:40px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">No recent activity.</div>`;
     return;
   }
 
@@ -304,7 +304,7 @@ async function renderActivity() {
   };
 
   content.innerHTML = `
-    <div class="saved-head rv"><h2>Derniers problèmes collectés</h2></div>
+    <div class="saved-head rv"><h2>Latest problems collected</h2></div>
     <div class="activity-list rv" style="animation-delay:.05s">
       ${data.map(p => `
         <div class="act-row">
@@ -324,7 +324,7 @@ function renderTab(tab) {
 
 // ── Main load ────────────────────────────────────────────────────
 async function loadSaved() {
-  // getSession = lecture localStorage, pas d'appel réseau → instantané
+  // getSession reads localStorage — instant, no network call
   const user = await PBAuth.getSession();
 
   if (!user) {
@@ -359,7 +359,7 @@ async function loadSaved() {
     savedIds = await PBData.getSavedIds();
   }
 
-  // Charge les problèmes depuis Supabase
+  // Load problems from Supabase
   let allProblems = [];
   const { data: probData } = await PBData.getProblems();
   if (probData && probData.length) allProblems = probData;
@@ -367,7 +367,7 @@ async function loadSaved() {
   renderSaved(savedIds, allProblems);
 }
 
-// Toujours charger l'état réel — pas de démo
+// Always load real state
 PBAuth.onAuthChange(() => loadSaved());
 loadSaved();
 </script>
