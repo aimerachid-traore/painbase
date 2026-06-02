@@ -4,31 +4,29 @@
 // ================================================================
 (function () {
 
-  const _t = k => (window.t || (x => x))(k);
-
   function PAGES() { return {
     'painbase-landing.html':   [
-      { href:'painbase-landing.html#explore',     label:_t('nav.browse') },
-      { href:'painbase-landing.html#leaderboard', label:_t('nav.leaderboard') },
-      { href:'painbase-landing.html#how',         label:_t('nav.how') },
-      { href:'painbase-pricing.html',             label:_t('nav.pricing') },
-      { href:'painbase-dashboard.html',           label:_t('nav.dashboard') },
+      { href:'painbase-landing.html#explore',     label:'Browse problems' },
+      { href:'painbase-landing.html#leaderboard', label:'Leaderboard' },
+      { href:'painbase-landing.html#how',         label:'How it works' },
+      { href:'painbase-pricing.html',             label:'Pricing' },
+      { href:'painbase-dashboard.html',           label:'Dashboard' },
     ],
     'painbase-detail': [
-      { href:'painbase-landing.html',             label:_t('nav.browse') },
-      { href:'painbase-landing.html#leaderboard', label:_t('nav.leaderboard') },
-      { href:'painbase-pricing.html',             label:_t('nav.pricing') },
-      { href:'painbase-dashboard.html',           label:_t('nav.dashboard') },
+      { href:'painbase-landing.html',             label:'Browse problems' },
+      { href:'painbase-landing.html#leaderboard', label:'Leaderboard' },
+      { href:'painbase-pricing.html',             label:'Pricing' },
+      { href:'painbase-dashboard.html',           label:'Dashboard' },
     ],
     'painbase-dashboard.html': [
-      { href:'painbase-landing.html',             label:_t('nav.browse') },
-      { href:'painbase-pricing.html',             label:_t('nav.pricing') },
-      { href:'painbase-dashboard.html',           label:_t('nav.dashboard'), active:true },
+      { href:'painbase-landing.html',             label:'Browse problems' },
+      { href:'painbase-pricing.html',             label:'Pricing' },
+      { href:'painbase-dashboard.html',           label:'Dashboard', active:true },
     ],
     'painbase-pricing.html': [
-      { href:'painbase-landing.html',             label:_t('nav.browse') },
-      { href:'painbase-dashboard.html',           label:_t('nav.dashboard') },
-      { href:'painbase-pricing.html',             label:_t('nav.pricing'), active:true },
+      { href:'painbase-landing.html',             label:'Browse problems' },
+      { href:'painbase-dashboard.html',           label:'Dashboard' },
+      { href:'painbase-pricing.html',             label:'Pricing', active:true },
     ],
   }; }
 
@@ -62,8 +60,8 @@
     ).join('') +
     `<div class="mob-divider"></div>
      <div class="mob-auth" id="mobAuth">
-       <button class="btn" style="background:var(--panel-2);border:1px solid var(--line);color:var(--ink);font-family:Archivo;font-weight:600;font-size:15px;padding:13px;border-radius:9px" onclick="PBAuthModal.open('signin')">${_t('mob.signin')}</button>
-       <button class="btn btn-primary" style="font-size:15px;padding:13px" onclick="PBAuthModal.open('signup')">${_t('mob.start')}</button>
+       <button class="btn" style="background:var(--panel-2);border:1px solid var(--line);color:var(--ink);font-family:Archivo;font-weight:600;font-size:15px;padding:13px;border-radius:9px" onclick="PBAuthModal.open('signin')">Sign in</button>
+       <button class="btn btn-primary" style="font-size:15px;padding:13px" onclick="PBAuthModal.open('signup')">Start hunting — free</button>
      </div>`;
     document.querySelector('nav').after(drawer);
 
@@ -115,7 +113,7 @@
             <div style="width:28px;height:28px;border-radius:50%;background:var(--ember);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1a0d08;flex:none">${(user.email||'U')[0].toUpperCase()}</div>
             <span style="font-size:14px;font-weight:500">${user.email}</span>
           </a>
-          <button class="btn" style="background:transparent;border:1px solid var(--line);color:var(--ink-faint);font-family:Archivo;font-weight:600;font-size:14px;padding:11px;border-radius:9px" id="mobSignOut">${_t('mob.signout')}</button>`;
+          <button class="btn" style="background:transparent;border:1px solid var(--line);color:var(--ink-faint);font-family:Archivo;font-weight:600;font-size:14px;padding:11px;border-radius:9px" id="mobSignOut">Sign out</button>`;
         document.getElementById('mobSignOut')?.addEventListener('click', () => PBAuth.signOut());
       } else {
         mobAuth.innerHTML = `

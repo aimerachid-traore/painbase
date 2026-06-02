@@ -9,7 +9,20 @@
 (function () {
 
   // ── Injection du HTML de la modal ─────────────────────────────
-  const _t = k => (window.t || (x => x))(k);
+  const _t = k => ({
+    'auth.signin_tab':'Sign in','auth.signup_tab':'Create account',
+    'auth.email':'Email','auth.password':'Password',
+    'auth.forgot':'Forgot password?','auth.signin_btn':'Sign in',
+    'auth.pass_placeholder':'Min. 8 characters','auth.signup_btn':'Create account',
+    'auth.or':'or','auth.google':'Continue with Google',
+    'auth.loading':'Loading…','auth.enter_email':'Enter your email first.',
+    'auth.reset_sent':'Reset link sent! Check your inbox.',
+    'auth.wrong_creds':'Invalid email or password.',
+    'auth.welcome':'Welcome back!',
+    'auth.account_created':'Account created! Check your inbox to confirm.',
+    'nav.saved':'Saved problems','nav.dashboard':'Dashboard',
+    'nav.signout':'Sign out','nav.signin':'Sign in','nav.start':'Start hunting',
+  })[k] || k;
 
   function buildModalHtml() { return `
 <div class="pb-overlay" id="pbOverlay">
