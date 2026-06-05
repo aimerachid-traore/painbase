@@ -238,6 +238,24 @@
   .rv{opacity:0;transform:translateY(16px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
   @keyframes rise{to{opacity:1;transform:none}}
 
+  /* ---------- PAGINATION ---------- */
+  .pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:32px;padding-bottom:8px}
+  .pg-btn{font-family:'JetBrains Mono';font-size:13px;font-weight:600;padding:9px 20px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);cursor:pointer;transition:all .16s}
+  .pg-btn:hover:not(:disabled){border-color:var(--ember);color:var(--ink)}
+  .pg-btn:disabled{opacity:.28;cursor:default}
+  .pg-info{font-family:'JetBrains Mono';font-size:12px;color:var(--ink-faint);min-width:100px;text-align:center}
+
+  /* ---------- CONTACT SECTION ---------- */
+  .contact-bar{border-top:1px solid var(--line-soft);margin-top:0;padding:36px 0 28px}
+  .contact-inner{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+  .contact-title{font-family:'Fraunces';font-size:18px;font-weight:600;letter-spacing:-.01em}
+  .contact-sub{font-size:13.5px;color:var(--ink-faint);max-width:40ch}
+  .contact-links{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center}
+  .cl-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);font-size:13.5px;font-weight:500;text-decoration:none;transition:all .18s}
+  .cl-btn:hover{border-color:var(--ember);color:var(--ink);background:var(--panel-2)}
+  .cl-btn svg{flex:none;width:17px;height:17px}
+  .cl-btn.patreon:hover{border-color:#FF424D;color:#FF424D}
+
   /* ---------- FREE BADGE ---------- */
   .free-badge{font-size:13px;color:var(--ink-faint);margin-top:11px;display:flex;align-items:center;gap:6px}
   .free-badge::before{content:"✓";color:var(--green);font-weight:700}
@@ -338,6 +356,11 @@
     </div>
 
     <div class="grid" id="grid"></div>
+    <div class="pagination" id="pagination" style="display:none">
+      <button class="pg-btn" id="pg-prev">← Prev</button>
+      <span class="pg-info" id="pg-info"></span>
+      <button class="pg-btn" id="pg-next">Next →</button>
+    </div>
   </div>
 </section>
 
@@ -440,19 +463,56 @@
   </div>
 </section>
 
+<div class="wrap contact-bar">
+  <div class="contact-inner">
+    <div class="contact-title">Contact &amp; suggestions</div>
+    <p class="contact-sub">Found a bug? Have an idea? Want to support the project? Reach out.</p>
+    <div class="contact-links">
+      <!-- Mail -->
+      <a href="mailto:rachidcreator7@gmail.com" class="cl-btn" title="Send an email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+        </svg>
+        rachidcreator7@gmail.com
+      </a>
+      <!-- GitHub -->
+      <a href="https://github.com/aimerachid-traore" target="_blank" rel="noopener" class="cl-btn" title="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        GitHub
+      </a>
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/rachid-traore" target="_blank" rel="noopener" class="cl-btn" title="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/>
+        </svg>
+        LinkedIn
+      </a>
+      <!-- Patreon -->
+      <a href="https://www.patreon.com/rachidtraore" target="_blank" rel="noopener" class="cl-btn patreon" title="Support on Patreon" id="patreon-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14.82 2.41C18.78 2.41 22 5.65 22 9.62c0 3.96-3.22 7.19-7.18 7.19-3.95 0-7.17-3.23-7.17-7.19 0-3.97 3.22-7.21 7.17-7.21M2 21.6h3.5V2.41H2V21.6z"/>
+        </svg>
+        Support on Patreon
+      </a>
+    </div>
+  </div>
+</div>
+
 <footer>
   <div class="wrap foot-in">
     <div>
-      <a href="#" class="logo" style="font-size:17px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
+      <a href="painbase-landing.html" class="logo" style="font-size:17px"><span class="mark" style="width:22px;height:22px"></span>PainBase</a>
       <div class="foot-note" style="margin-top:10px">Real problems, mined hourly. Built for builders.</div>
     </div>
     <div class="foot-links">
       <a href="#explore">Browse</a>
       <a href="#leaderboard">Leaderboard</a>
       <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
       <a href="painbase-pricing.html">Pricing</a>
       <a href="painbase-dashboard.html">Dashboard</a>
-      <a href="#">API</a>
       <a href="#">Terms</a>
     </div>
   </div>
@@ -475,6 +535,8 @@
   let _problems = [];
   let _searchTimer = null;
   let _stepTimer = null;
+  let _page = 0;
+  const PAGE_SIZE = 12;
 
   const fmt = n => n.toLocaleString('en-US');
 
@@ -492,6 +554,20 @@
     return `<span class="gap ${cls}">${score}/100</span>`;
   }
 
+  function renderPagination(total, page){
+    const pgEl = document.getElementById('pagination');
+    const pgInfo = document.getElementById('pg-info');
+    const pgPrev = document.getElementById('pg-prev');
+    const pgNext = document.getElementById('pg-next');
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    if(!pgEl) return;
+    if(totalPages <= 1){ pgEl.style.display='none'; return; }
+    pgEl.style.display='flex';
+    pgInfo.textContent = `Page ${page+1} / ${totalPages}`;
+    pgPrev.disabled = page === 0;
+    pgNext.disabled = page >= totalPages - 1;
+  }
+
   function render(){
     if(!grid) return;
     const q = search ? search.value.trim().toLowerCase() : '';
@@ -503,7 +579,11 @@
     if(resultCount) resultCount.textContent = list.length + (list.length===1?' problem':' problems');
 
     if(list.length){
-      grid.innerHTML = list.map(p=>`
+      const page = _problems.length > PAGE_SIZE ? _page : 0;
+      const start = page * PAGE_SIZE;
+      const pageList = list.slice(start, start + PAGE_SIZE);
+      renderPagination(list.length, page);
+      grid.innerHTML = pageList.map(p=>`
         <a class="card ${p.hot?'hot':''}" href="painbase-detail.html#id=${p.id}" style="text-decoration:none;color:inherit">
           <div class="intensity"></div>
           <div class="card-top">
@@ -599,9 +679,18 @@
     chips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
     e.target.classList.add('active');
     activeTheme = e.target.dataset.theme;
-    render();
+    _page = 0; render();
   });
-  if(search) search.addEventListener('input', render);
+  if(search) search.addEventListener('input', () => { _page = 0; render(); });
+
+  const pgPrevBtn = document.getElementById('pg-prev');
+  const pgNextBtn = document.getElementById('pg-next');
+  if(pgPrevBtn) pgPrevBtn.addEventListener('click', () => {
+    if(_page > 0){ _page--; render(); document.getElementById('explore').scrollIntoView({behavior:'smooth'}); }
+  });
+  if(pgNextBtn) pgNextBtn.addEventListener('click', () => {
+    _page++; render(); document.getElementById('explore').scrollIntoView({behavior:'smooth'});
+  });
 
   // Spinner initial
   if(grid) grid.innerHTML = `<div style="grid-column:1/-1;padding:60px 0;text-align:center;color:var(--ink-faint);font-family:'JetBrains Mono';font-size:13px">Loading problems…</div>`;
