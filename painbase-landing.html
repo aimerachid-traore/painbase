@@ -238,6 +238,65 @@
   .rv{opacity:0;transform:translateY(16px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
   @keyframes rise{to{opacity:1;transform:none}}
 
+  /* ======================================
+     RESPONSIVE — mobile first patches
+     ====================================== */
+  @media(max-width:640px){
+    /* Hero */
+    header{padding:52px 0 36px}
+    h1{font-size:clamp(34px,9vw,52px);max-width:none}
+    .sub{font-size:16px;max-width:none}
+    .searchbar{max-width:100%;border-radius:13px;padding:5px 5px 5px 16px}
+    .searchbar input{font-size:14px}
+    .searchbar button{padding:10px 16px;font-size:13px}
+    .stats{gap:20px;flex-wrap:wrap}
+    .stat .num{font-size:22px}
+    .live{font-size:10px;padding:5px 10px}
+
+    /* Section heads */
+    .shead{flex-direction:column;gap:6px;align-items:flex-start}
+
+    /* Cards */
+    .card{min-height:auto}
+
+    /* Themes chips — scroll horizontal */
+    .themes{flex-wrap:nowrap;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .themes::-webkit-scrollbar{display:none}
+
+    /* Leaderboard */
+    .row{grid-template-columns:32px 1fr 60px;gap:8px;padding:12px 14px}
+    .row .p-mentions-col,.row .col-bar{display:none}
+    .rank{font-size:13px}
+    .row .p-name{font-size:13.5px}
+
+    /* How it works */
+    .step{padding:20px}
+
+    /* FAQ */
+    .faq-item summary{padding:15px 16px;font-size:14px}
+    .faq-item .faq-body{padding:0 16px 14px;font-size:13.5px}
+
+    /* Pagination */
+    .pg-btn{padding:8px 14px;font-size:12px}
+    .pg-info{font-size:11px;min-width:80px}
+
+    /* Contact */
+    .contact-links{flex-direction:column;align-items:stretch}
+    .cl-btn{justify-content:center}
+
+    /* Footer */
+    .foot-in{flex-direction:column;gap:24px;align-items:flex-start}
+    .foot-links{gap:16px}
+
+    /* CTA */
+    .cta{padding:40px 22px}
+  }
+
+  @media(max-width:400px){
+    .wrap{padding:0 16px}
+    h1{font-size:32px}
+  }
+
   /* ---------- PAGINATION ---------- */
   .pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:32px;padding-bottom:8px}
   .pg-btn{font-family:'JetBrains Mono';font-size:13px;font-weight:600;padding:9px 20px;border-radius:9px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);cursor:pointer;transition:all .16s}
@@ -683,6 +742,15 @@
   });
   if(search) search.addEventListener('input', () => { _page = 0; render(); });
 
+  // Click sur la search quand non connecté → ouvre la modal
+  const searchBtn = document.querySelector('.searchbar button');
+  if(search) search.addEventListener('click', () => {
+    if(!_isAuthed) { PBAuthModal.open('signup'); return; }
+  });
+  if(searchBtn) searchBtn.addEventListener('click', () => {
+    if(!_isAuthed) { PBAuthModal.open('signup'); return; }
+  });
+
   const pgPrevBtn = document.getElementById('pg-prev');
   const pgNextBtn = document.getElementById('pg-next');
   if(pgPrevBtn) pgPrevBtn.addEventListener('click', () => {
@@ -737,7 +805,13 @@
     </div>`;
     // Verrouille chips + search
     if(chips){chips.style.opacity='.4';chips.style.pointerEvents='none';}
-    if(search){search.readOnly=true;search.placeholder='Sign in to search all problems…';search.style.cursor='pointer';}
+    if(search){
+      search.readOnly=true;
+      search.placeholder='Sign in to search all problems…';
+      search.style.cursor='pointer';
+      search.parentElement.style.cursor='pointer';
+      search.parentElement.title='Sign in to search';
+    }
   }
 
   function unlockUI(){
